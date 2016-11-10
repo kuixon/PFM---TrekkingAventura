@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">TrekkingAventura</string>
+    <string-array name="Tags">
+        <item>Mis excursiones</item>
+        <item>Buscar excursiones</item>
+        <item>Ajustes</item>
+    </string-array>
+    <string name="drawer_open">Abrir navigation drawer</string>
+    <string name="drawer_close">Cerrar navigation drawer</string>
+    <string name="add_excursion">Añadir Excursión</string>
+    <string name="search_excursion">Buscar Excursión</string>
+    <string name="create_excursion">Crear Excursión</string>
+    <string name="cancel_excursion">Cancelar</string>
+    <string name="label_excursion_name">Nombre</string>
+    <string name="label_excursion_opinion">Descripción/Opinión</string>
+    <string name="label_excursion_level">Nivel</string>
+    <string name="label_excursion_level_low">Fácil</string>
+    <string name="label_excursion_level_medium">Medio</string>
+    <string name="label_excursion_level_high">Difícil</string>
+    <string name="label_excursion_distance">Distancia (km)</string>
+    <string name="label_excursion_location">Lugar</string>
+    <string name="label_excursion_latitude">Latitud</string>
+    <string name="label_excursion_longitude">Longitud</string>
+    <string name="button_geolocate">Geolocalizar</string>
+    <string name="button_add_image">Añadir imagen</string>
+</resources>
