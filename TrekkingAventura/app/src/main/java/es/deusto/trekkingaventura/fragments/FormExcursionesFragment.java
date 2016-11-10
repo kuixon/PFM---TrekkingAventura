@@ -1,6 +1,7 @@
 package es.deusto.trekkingaventura.fragments;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -142,24 +144,29 @@ public class FormExcursionesFragment extends Fragment implements
 
     private void addImage(View v) {
 
-        final CharSequence[] options = {"Take image", "Import from gallery", "Cancel"};
+        final String[] menu_tags = getResources().getStringArray(R.array.Add_Image_Menu);
+        final CharSequence[] options = {menu_tags[0], menu_tags[1], menu_tags[2]};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-        builder.setTitle("Add image");
+        builder.setTitle(R.string.add_menu_title);
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
                 if (options[item].equals(options[0])) {
                     Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                    File image = null;
-                    try {
-                        image = ImageHelper.createImageFile();
-                        imageUri = Uri.fromFile(image);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                        startActivityForResult(intent, IMG_FROM_CAMERA);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                        File image = null;
+                        try {
+                            image = ImageHelper.createImageFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (image != null) {
+                            imageUri = Uri.fromFile(image);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                            startActivityForResult(intent, IMG_FROM_CAMERA);
+                        }
                     }
                 } else if (options[item].equals(options[1])) {
                     Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -176,21 +183,20 @@ public class FormExcursionesFragment extends Fragment implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == IMG_FROM_CAMERA) {
             if (resultCode == RESULT_OK) {
-                Uri selectedImage = data.getData();
-                String[] filePath = {MediaStore.Images.Media.DATA};
-                Cursor c = getContext().getContentResolver().query(selectedImage, filePath, null, null, null);
-                if(c.moveToFirst()) {
-                    int columnIndex = c.getColumnIndex(filePath[0]);
-                    String picturePath = c.getString(columnIndex);
-                    c.close();
-                    Log.i("Ruta foto", picturePath);
-                    txtImage.setText(picturePath);
-                    txtImage.setVisibility(View.VISIBLE);
-                    deleteSelectedImg.setVisibility(View.VISIBLE);
+                // Obtenemos la imagen sacada con la cámara y de momento no hacemos nada con ella
+                getContext().getContentResolver().notifyChange(imageUri, null);
+                ContentResolver cr = getContext().getContentResolver();
+                Bitmap bitmap;
+                try {
+                    bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, imageUri);
+                } catch (Exception e) {
+                    Log.d("APP", "Failed to load", e);
                 }
-                Log.i("INFO", "Se resuelve el intent correctamente");
-            } else {
-                Log.i("ERROR", "No se resuleve el intent correctamente");
+
+                // Cambiamos el el TextView con el Path de la foto.
+                txtImage.setText(imageUri.getPath());
+                txtImage.setVisibility(View.VISIBLE);
+                deleteSelectedImg.setVisibility(View.VISIBLE);
             }
         } else if (requestCode == IMG_FROM_GALLERY) {
             if (resultCode == RESULT_OK) {

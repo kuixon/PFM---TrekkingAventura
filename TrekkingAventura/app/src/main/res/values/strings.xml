@@ -5,6 +5,12 @@
         <item>Buscar excursiones</item>
         <item>Ajustes</item>
     </string-array>
+    <string-array name="Add_Image_Menu">
+        <item>Cámara</item>
+        <item>Galería</item>
+        <item>Cancelar</item>
+    </string-array>
+    <string name="add_menu_title">Añadir imagen</string>
     <string name="drawer_open">Abrir navigation drawer</string>
     <string name="drawer_close">Cerrar navigation drawer</string>
     <string name="add_excursion">Añadir Excursión</string>
