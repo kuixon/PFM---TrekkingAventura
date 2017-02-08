@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 
 import es.deusto.trekkingaventura.R;
+import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.utilities.ImageHelper;
 
 import static android.app.Activity.RESULT_OK;
@@ -131,6 +132,19 @@ public class FormExcursionesFragment extends Fragment implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.mnu_cancel_create_exc) {
+            Fragment fragment = new MisExcursionesFragment();
+            Bundle args = new Bundle();
+            args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
+            fragment.setArguments(args);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+        } else if (id == R.id.mnu_create_exc) {
+            // Se tendría que crear la excursión y almacenarla en la BDD del servidor.
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
