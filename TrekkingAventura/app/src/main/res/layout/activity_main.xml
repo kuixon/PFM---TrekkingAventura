@@ -4,7 +4,8 @@
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+    tools:context=".activities.MainActivity"
+    android:background="@color/colorBackground">
 
     <include
         android:id="@+id/tool_bar"
@@ -29,7 +30,7 @@
             android:layout_gravity="start"
             android:choiceMode="singleChoice"
             android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
+            android:dividerHeight="0.8sp"
             android:background="#111"/>
 
     </android.support.v4.widget.DrawerLayout>

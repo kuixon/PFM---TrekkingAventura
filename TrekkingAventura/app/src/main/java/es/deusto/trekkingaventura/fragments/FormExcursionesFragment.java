@@ -163,7 +163,7 @@ public class FormExcursionesFragment extends Fragment implements
         try {
             addresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
         } catch (IOException e) {
-            Log.i("Error", "FALLO");
+            Log.i("Error", "No se ha podido obtener la dirección.");
             e.printStackTrace();
         }
 

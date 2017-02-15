@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -54,6 +55,17 @@ public class MisExcursionesFragment extends Fragment {
         adpExcursiones = new ExcursionListAdapter(getContext(), R.layout.excursion_list_adapter, arrExcursiones);
         listExcursiones.setAdapter(adpExcursiones);
 
+        listExcursiones.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Fragment fragment = new ExcursionFragment();
+                Bundle args = new Bundle();
+                args.putSerializable(ExcursionFragment.EXCURSION_KEY, arrExcursiones.get(position));
+                fragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            }
+        });
+
         return rootView;
     }
 
@@ -71,12 +83,14 @@ public class MisExcursionesFragment extends Fragment {
     private void createExcursionList() {
 
         // Creamos tres excursiones de prueba y las metemos al array de Excursiones.
-        Excursion exc1 = new Excursion(1,"Excursion 1", "Me gusto mucho", "Facil", 42.3,"Karrantza Harana",Float.parseFloat("1.35232"),Float.parseFloat("-1.5623"),"");
+        Excursion exc1 = new Excursion(1,"Excursion 1", "Me ha gustado mucho, ya que la travesía ha estado muy bien con muy buenos paisajes y vistas espectaculares; muy recomendable para ir en familia", "Facil", 42.3,"Karrantza Harana",Float.parseFloat("1.35232"),Float.parseFloat("-1.5623"),"");
         Excursion exc2 = new Excursion(2,"Excursion 2", "Me gusto poco", "Medio", 12.5,"Zalla",Float.parseFloat("1.26"),Float.parseFloat("1.6423"),"");
         Excursion exc3 = new Excursion(3,"Excursion 3", "Me gusto algo", "Dificil", 35.31,"Bilbao",Float.parseFloat("2.3528"),Float.parseFloat("3.54255"),"");
+        Excursion exc4 = new Excursion(4,"Excursion 4", "No ha estado mal, el camino se converva en un mal estado pero las vistas de los acantilados no tienen precio", "Facil", 24.85,"Santoña",Float.parseFloat("1.3648"),Float.parseFloat("-1.12345"),"");
         arrExcursiones = new ArrayList<Excursion>();
         arrExcursiones.add(exc1);
         arrExcursiones.add(exc2);
         arrExcursiones.add(exc3);
+        arrExcursiones.add(exc4);
     }
 }

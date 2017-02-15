@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             if (id == R.id.mnu_add) {
                 Fragment fragment = new FormExcursionesFragment();
                 Bundle args = new Bundle();
-                args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES, "Formulario excursión");
+                args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES, "Formulario");
                 fragment.setArguments(args);
                 getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
