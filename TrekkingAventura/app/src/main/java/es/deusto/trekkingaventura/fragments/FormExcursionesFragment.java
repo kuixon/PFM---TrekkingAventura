@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,10 +28,13 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
@@ -54,6 +58,7 @@ public class FormExcursionesFragment extends Fragment implements
     private Button btnAddImage;
     private EditText edtLatitude;
     private EditText edtLongitude;
+    private EditText edtLocation;
     private TextView txtImage;
     private ImageButton deleteSelectedImg;
 
@@ -79,6 +84,7 @@ public class FormExcursionesFragment extends Fragment implements
 
         edtLatitude = (EditText) rootView.findViewById(R.id.edtLatitude);
         edtLongitude = (EditText) rootView.findViewById(R.id.edtLongitude);
+        edtLocation = (EditText) rootView.findViewById(R.id.edtLocation);
         txtImage = (TextView) rootView.findViewById(R.id.txtImage);
 
         btnGeolocate = (Button) rootView.findViewById(R.id.button_geolocate);
@@ -150,10 +156,23 @@ public class FormExcursionesFragment extends Fragment implements
 
     public void geolocate(View v) {
         Location loc = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+
+        List<android.location.Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+        } catch (IOException e) {
+            Log.i("Error", "FALLO");
+            e.printStackTrace();
+        }
+
         Log.i("Latitude", Double.toString(loc.getLatitude()));
         Log.i("Longitude", Double.toString(loc.getLongitude()));
+        Log.i("City", addresses.get(0).getLocality());
         edtLatitude.setText(Double.toString(loc.getLatitude()));
         edtLongitude.setText(Double.toString(loc.getLongitude()));
+        edtLocation.setText(addresses.get(0).getLocality());
     }
 
     private void addImage(View v) {
