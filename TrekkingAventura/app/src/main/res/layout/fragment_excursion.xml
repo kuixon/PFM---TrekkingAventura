@@ -66,7 +66,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/txtLocation"
-                    android:layout_weight="0.7"
+                    android:layout_weight="0.6"
                     android:textStyle="normal|bold"
                     android:textSize="18sp" />
                 <TextView
@@ -74,7 +74,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/excLocation"
-                    android:layout_weight="0.3" />
+                    android:layout_weight="0.4" />
             </LinearLayout>
 
             <LinearLayout
@@ -85,39 +85,33 @@
                 android:paddingBottom="5dp">
                 <TextView
                     android:text="Distancia:"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/txtDistance"
-                    android:layout_weight="0.7"
                     android:textStyle="normal|bold"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:layout_weight="0.25"/>
                 <TextView
                     android:text="Contenido Distancia"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/excDistance"
-                    android:layout_weight="0.3" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:weightSum="1"
-                android:paddingBottom="5dp">
+                    android:layout_weight="0.25"
+                    android:id="@+id/excDistance" />
                 <TextView
                     android:text="Nivel:"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/txtNivel"
-                    android:layout_weight="0.7"
                     android:textStyle="normal|bold"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:layout_weight="0.25"/>
                 <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
                     android:id="@+id/excLevel"
-                    android:layout_weight="0.3"/>
+                    android:layout_weight="0.25"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="true" />
             </LinearLayout>
 
             <LinearLayout
@@ -128,40 +122,32 @@
                 android:paddingBottom="5dp">
                 <TextView
                     android:text="Latitud:"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/txtLatitude"
-                    android:layout_weight="0.7"
+                    android:layout_weight="0.25"
                     android:textStyle="normal|bold"
                     android:textSize="18sp" />
                 <TextView
                     android:text="Contenido Latitud"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/excLatitude"
-                    android:layout_weight="0.3" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:weightSum="1"
-                android:paddingBottom="5dp">
+                    android:layout_weight="0.25" />
                 <TextView
                     android:text="Longitud:"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/txtLongitude"
-                    android:layout_weight="0.7"
+                    android:layout_weight="0.25"
                     android:textStyle="normal|bold"
                     android:textSize="18sp" />
                 <TextView
                     android:text="Contenido Longitud"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/excLongitude"
-                    android:layout_weight="0.3" />
+                    android:layout_weight="0.25" />
             </LinearLayout>
 
             <TextView

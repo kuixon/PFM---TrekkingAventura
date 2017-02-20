@@ -1,13 +1,11 @@
 package es.deusto.trekkingaventura.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -41,8 +39,23 @@ public class ExcursionListAdapter extends ArrayAdapter<Excursion> {
             TextView txtLocation = (TextView) v.findViewById(R.id.excursionLocation);
             TextView txtDistance = (TextView) v.findViewById(R.id.excursionDistance);
 
-            imageExcursion.setImageResource(R.drawable.mountain);
+            switch (excursion.getImgPath()) {
+                case "Cares":
+                    imageExcursion.setImageResource(R.drawable.rutadelcares);
+                    break;
+                case "Relux":
+                    imageExcursion.setImageResource(R.drawable.ventanarelux);
+                    break;
+                case "Caballo":
+                    imageExcursion.setImageResource(R.drawable.farodelcaballo);
+                    break;
+                case "Gorbea":
+                    imageExcursion.setImageResource(R.drawable.gorbea);
+                    break;
+            }
+
             txtName.setText(excursion.getName());
+
             switch (excursion.getLevel()) {
                 case "Facil":
                     imageLevel.setImageResource(R.drawable.facil);

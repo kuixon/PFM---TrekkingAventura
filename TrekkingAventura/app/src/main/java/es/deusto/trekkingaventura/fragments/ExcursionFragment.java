@@ -57,11 +57,25 @@ public class ExcursionFragment extends Fragment {
         txtLatitude = (TextView) rootView.findViewById(R.id.excLatitude);
         txtLongitude = (TextView) rootView.findViewById(R.id.excLongitude);
 
-        imgExc.setImageResource(R.drawable.mountain);
+        switch (excursion.getImgPath()) {
+            case "Cares":
+                imgExc.setImageResource(R.drawable.rutadelcares);
+                break;
+            case "Relux":
+                imgExc.setImageResource(R.drawable.ventanarelux);
+                break;
+            case "Caballo":
+                imgExc.setImageResource(R.drawable.farodelcaballo);
+                break;
+            case "Gorbea":
+                imgExc.setImageResource(R.drawable.gorbea);
+                break;
+        }
+
         txtName.setText(excursion.getName());
         txtDescription.setText(excursion.getOpinion());
         txtLocation.setText(excursion.getLocation());
-        txtDistance.setText(Double.toString(excursion.getTravelDistance()));
+        txtDistance.setText(Double.toString(excursion.getTravelDistance()) + " km");
         switch (excursion.getLevel()) {
             case "Facil":
                 imgLevel.setImageResource(R.drawable.facil);

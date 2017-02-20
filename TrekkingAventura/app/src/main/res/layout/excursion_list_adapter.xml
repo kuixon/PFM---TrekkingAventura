@@ -7,8 +7,7 @@
         android:id="@+id/excursionImage"
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:scaleType="centerCrop"
-        android:background="@drawable/mountain"/>
+        android:scaleType="centerCrop" />
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="160dp"

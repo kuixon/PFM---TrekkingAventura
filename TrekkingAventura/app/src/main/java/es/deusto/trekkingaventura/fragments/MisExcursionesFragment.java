@@ -83,10 +83,10 @@ public class MisExcursionesFragment extends Fragment {
     private void createExcursionList() {
 
         // Creamos tres excursiones de prueba y las metemos al array de Excursiones.
-        Excursion exc1 = new Excursion(1,"Excursion 1", "Me ha gustado mucho, ya que la travesía ha estado muy bien con muy buenos paisajes y vistas espectaculares; muy recomendable para ir en familia", "Facil", 42.3,"Karrantza Harana",Float.parseFloat("1.35232"),Float.parseFloat("-1.5623"),"");
-        Excursion exc2 = new Excursion(2,"Excursion 2", "Me gusto poco", "Medio", 12.5,"Zalla",Float.parseFloat("1.26"),Float.parseFloat("1.6423"),"");
-        Excursion exc3 = new Excursion(3,"Excursion 3", "Me gusto algo", "Dificil", 35.31,"Bilbao",Float.parseFloat("2.3528"),Float.parseFloat("3.54255"),"");
-        Excursion exc4 = new Excursion(4,"Excursion 4", "No ha estado mal, el camino se converva en un mal estado pero las vistas de los acantilados no tienen precio", "Facil", 24.85,"Santoña",Float.parseFloat("1.3648"),Float.parseFloat("-1.12345"),"");
+        Excursion exc1 = new Excursion(1,"Ruta del Cares", "Un sitio espectacular con unas vistas impresionantes. Ideal para ir con la familia y para sacar fotos de los acantilados.", "Medio", 12,"Arenas de Cabrales",Float.parseFloat("43.2551652"),Float.parseFloat("-4.8366377"),"Cares");
+        Excursion exc2 = new Excursion(2,"Ventana Relux", "Unas vistas impresionantes desde la ventana. Una caída libre espectacular que merece ser fotografiada. Ideal para la familia.", "Facil", 2.7,"Karrantza Harana",Float.parseFloat("43.2499237"),Float.parseFloat("-3.4108149"),"Relux");
+        Excursion exc3 = new Excursion(3,"Faro del Caballo", "Excursión muy bonita para ver todos los acantilados del monte Buciero de Santoña. Ideal para ir en pareja y para pasar el día.", "Medio", 12,"Santoña",Float.parseFloat("43.4514626"),Float.parseFloat("-3.4256904"),"Caballo");
+        Excursion exc4 = new Excursion(4,"Gorbea", "Subida preciosa a uno de los montes más característicos de Bizkaia. Recorrido un poco duro pero el paisaje merece la pena.", "Dificil", 12,"Areatza",Float.parseFloat("43.0350000"),Float.parseFloat("-2.7798800"),"Gorbea");
         arrExcursiones = new ArrayList<Excursion>();
         arrExcursiones.add(exc1);
         arrExcursiones.add(exc2);
