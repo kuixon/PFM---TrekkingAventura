@@ -1,10 +1,13 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -146,6 +149,17 @@ public class ExcursionFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.excursion, menu);
+
+        MenuItem mnuShare = menu.findItem(R.id.mnu_share);
+
+        String shareText = "*" + excursion.getName() + "*\n" + excursion.getOpinion();
+
+        ShareActionProvider shareProv = (ShareActionProvider) MenuItemCompat.getActionProvider(mnuShare);
+        shareProv.setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, shareText);
+        shareProv.setShareIntent(intent);
     }
 
     @Override

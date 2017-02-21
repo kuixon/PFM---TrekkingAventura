@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/mnu_share" android:title="@string/share_excursion" android:icon="@drawable/ic_share_white_24dp"
+        app:showAsAction="always" app:actionProviderClass="android.support.v7.widget.ShareActionProvider" />
     <item android:id="@+id/mnu_edit_exc" android:title="@string/edit_excursion" android:icon="@drawable/ic_mode_edit_white_24dp"
         app:showAsAction="always"/>
     <item android:id="@+id/mnu_delete_exc" android:title="@string/delete_excursion" app:showAsAction="always"
