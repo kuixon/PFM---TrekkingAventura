@@ -197,7 +197,6 @@ public class ExcursionFragment extends Fragment {
         protected Weather doInBackground(String... params) {
             Weather weather = new Weather();
             String data = ((new WeatherHttpClient()).getWeatherData(params[0]));
-
             if (data != null) {
                 try {
                     weather = JSONWeatherParser.getWeather(data);
@@ -217,65 +216,68 @@ public class ExcursionFragment extends Fragment {
             super.onPostExecute(weather);
 
             if (weather != null) {
-
-                switch (weather.currentCondition.getIcon()) {
-                    case "01d":
-                        imgView.setImageResource(R.drawable.img01d);
-                        break;
-                    case "01n":
-                        imgView.setImageResource(R.drawable.img01n);
-                        break;
-                    case "02d":
-                        imgView.setImageResource(R.drawable.img02d);
-                        break;
-                    case "02n":
-                        imgView.setImageResource(R.drawable.img02n);
-                        break;
-                    case "03d":
-                        imgView.setImageResource(R.drawable.img03d);
-                        break;
-                    case "03n":
-                        imgView.setImageResource(R.drawable.img03n);
-                        break;
-                    case "04d":
-                        imgView.setImageResource(R.drawable.img04d);
-                        break;
-                    case "04n":
-                        imgView.setImageResource(R.drawable.img04n);
-                        break;
-                    case "09d":
-                        imgView.setImageResource(R.drawable.img09d);
-                        break;
-                    case "09n":
-                        imgView.setImageResource(R.drawable.img09n);
-                        break;
-                    case "10d":
-                        imgView.setImageResource(R.drawable.img10d);
-                        break;
-                    case "10n":
-                        imgView.setImageResource(R.drawable.img10n);
-                        break;
-                    case "11d":
-                        imgView.setImageResource(R.drawable.img11d);
-                        break;
-                    case "11n":
-                        imgView.setImageResource(R.drawable.img11n);
-                        break;
-                    case "13d":
-                        imgView.setImageResource(R.drawable.img13d);
-                        break;
-                    case "13n":
-                        imgView.setImageResource(R.drawable.img13n);
-                        break;
-                    case "50d":
-                        imgView.setImageResource(R.drawable.img50d);
-                        break;
-                    case "50n":
-                        imgView.setImageResource(R.drawable.img50n);
-                        break;
-                    default:
-                        imgView.setImageResource(R.drawable.imgnotavailable);
-                        break;
+                if (weather.currentCondition.getIcon() != null) {
+                    switch (weather.currentCondition.getIcon()) {
+                        case "01d":
+                            imgView.setImageResource(R.drawable.img01d);
+                            break;
+                        case "01n":
+                            imgView.setImageResource(R.drawable.img01n);
+                            break;
+                        case "02d":
+                            imgView.setImageResource(R.drawable.img02d);
+                            break;
+                        case "02n":
+                            imgView.setImageResource(R.drawable.img02n);
+                            break;
+                        case "03d":
+                            imgView.setImageResource(R.drawable.img03d);
+                            break;
+                        case "03n":
+                            imgView.setImageResource(R.drawable.img03n);
+                            break;
+                        case "04d":
+                            imgView.setImageResource(R.drawable.img04d);
+                            break;
+                        case "04n":
+                            imgView.setImageResource(R.drawable.img04n);
+                            break;
+                        case "09d":
+                            imgView.setImageResource(R.drawable.img09d);
+                            break;
+                        case "09n":
+                            imgView.setImageResource(R.drawable.img09n);
+                            break;
+                        case "10d":
+                            imgView.setImageResource(R.drawable.img10d);
+                            break;
+                        case "10n":
+                            imgView.setImageResource(R.drawable.img10n);
+                            break;
+                        case "11d":
+                            imgView.setImageResource(R.drawable.img11d);
+                            break;
+                        case "11n":
+                            imgView.setImageResource(R.drawable.img11n);
+                            break;
+                        case "13d":
+                            imgView.setImageResource(R.drawable.img13d);
+                            break;
+                        case "13n":
+                            imgView.setImageResource(R.drawable.img13n);
+                            break;
+                        case "50d":
+                            imgView.setImageResource(R.drawable.img50d);
+                            break;
+                        case "50n":
+                            imgView.setImageResource(R.drawable.img50n);
+                            break;
+                        default:
+                            imgView.setImageResource(R.drawable.imgnotavailable);
+                            break;
+                    }
+                } else {
+                    imgView.setImageResource(R.drawable.imgnotavailable);
                 }
 
                 cityText.setText(weather.location.getCity() + "," + weather.location.getCountry());
@@ -284,7 +286,11 @@ public class ExcursionFragment extends Fragment {
                 hum.setText("" + weather.currentCondition.getHumidity() + "%");
                 press.setText("" + weather.currentCondition.getPressure() + " hPa");
                 windSpeed.setText("" + weather.wind.getSpeed() + " mps");
-                windDeg.setText("" + weather.wind.getDeg() + "º");
+                if (weather.wind.getDeg() != -1111) {
+                    windDeg.setText("" + weather.wind.getDeg() + "º");
+                } else {
+                    windDeg.setText("");
+                }
 
                 panelTiempo.setVisibility(View.VISIBLE);
             } else {

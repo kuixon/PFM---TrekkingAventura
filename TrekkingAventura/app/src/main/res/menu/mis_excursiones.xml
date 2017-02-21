@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/mnu_search" android:title="@string/search_excursion" android:icon="@drawable/ic_search_white_24dp"
-        app:showAsAction="always"/>
+        app:showAsAction="always" app:actionViewClass="android.support.v7.widget.SearchView" />
     <item android:id="@+id/mnu_add" android:title="@string/add_excursion" app:showAsAction="always"
         android:icon="@drawable/ic_add_white_24dp" />
 </menu>

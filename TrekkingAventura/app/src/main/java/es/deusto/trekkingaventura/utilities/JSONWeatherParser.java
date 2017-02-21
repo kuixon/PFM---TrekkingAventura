@@ -41,7 +41,11 @@ public class JSONWeatherParser {
         weather.currentCondition.setWeatherId(getInt("id", JSONWeather));
         weather.currentCondition.setDescr(getString("description", JSONWeather));
         weather.currentCondition.setCondition(getString("main", JSONWeather));
-        weather.currentCondition.setIcon(getString("icon", JSONWeather));
+        if (data.contains("icon")) {
+            weather.currentCondition.setIcon(getString("icon", JSONWeather));
+        } else {
+            weather.currentCondition.setIcon(null);
+        }
 
         JSONObject mainObj = getObject("main", jObj);
         weather.currentCondition.setHumidity(getInt("humidity", mainObj));
@@ -53,7 +57,11 @@ public class JSONWeatherParser {
         // Wind
         JSONObject wObj = getObject("wind", jObj);
         weather.wind.setSpeed(getFloat("speed", wObj));
-        weather.wind.setDeg(getFloat("deg", wObj));
+        if (data.contains("deg")) {
+            weather.wind.setDeg(getFloat("deg", wObj));
+        } else {
+            weather.wind.setDeg(-1111);
+        }
 
         // Clouds
         JSONObject cObj = getObject("clouds", jObj);

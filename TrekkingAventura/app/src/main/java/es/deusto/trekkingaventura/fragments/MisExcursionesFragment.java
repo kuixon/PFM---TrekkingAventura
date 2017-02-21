@@ -1,7 +1,11 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +29,7 @@ public class MisExcursionesFragment extends Fragment {
 
     private ListView listExcursiones;
     private ArrayList<Excursion> arrExcursiones;
+    private ArrayList<Excursion> arrExcursionesFiltered;
     private ExcursionListAdapter adpExcursiones;
 
     public MisExcursionesFragment() {
@@ -52,7 +57,7 @@ public class MisExcursionesFragment extends Fragment {
 
         // Inicializamos el list adapter personalizado y le cambiamos el adaptador a la lista por
         // el inicializado.
-        adpExcursiones = new ExcursionListAdapter(getContext(), R.layout.excursion_list_adapter, arrExcursiones);
+        adpExcursiones = new ExcursionListAdapter(getContext(), R.layout.excursion_list_adapter, arrExcursionesFiltered);
         listExcursiones.setAdapter(adpExcursiones);
 
         listExcursiones.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -60,7 +65,7 @@ public class MisExcursionesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Fragment fragment = new ExcursionFragment();
                 Bundle args = new Bundle();
-                args.putSerializable(ExcursionFragment.EXCURSION_KEY, arrExcursiones.get(position));
+                args.putSerializable(ExcursionFragment.EXCURSION_KEY, arrExcursionesFiltered.get(position));
                 fragment.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
@@ -73,6 +78,59 @@ public class MisExcursionesFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.mis_excursiones, menu);
+
+        final SearchView searchView = (SearchView) menu.findItem(R.id.mnu_search).getActionView();
+        final MenuItem addItem = menu.findItem(R.id.mnu_add);
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                addItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                return false;
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                doMySearch(newText);
+                return false;
+            }
+        });
+
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(true);
+    }
+
+    private void doMySearch(String query) {
+        if (query.isEmpty()) {
+            arrExcursionesFiltered = new ArrayList<Excursion>(arrExcursiones);
+        } else {
+            arrExcursionesFiltered = new ArrayList<Excursion>();
+
+            for (int i = 0; i < arrExcursiones.size(); i++) {
+                if (arrExcursiones.get(i).getName().toLowerCase().contains(query.toLowerCase())) {
+                    arrExcursionesFiltered.add(arrExcursiones.get(i));
+                }
+            }
+        }
+
+        adpExcursiones = new ExcursionListAdapter(getContext(), R.layout.excursion_list_adapter, arrExcursionesFiltered);
+
+        listExcursiones.setAdapter(adpExcursiones);
     }
 
     @Override
@@ -87,10 +145,17 @@ public class MisExcursionesFragment extends Fragment {
         Excursion exc2 = new Excursion(2,"Ventana Relux", "Unas vistas impresionantes desde la ventana. Una caída libre espectacular que merece ser fotografiada. Ideal para la familia.", "Facil", 2.7,"Karrantza Harana",Float.parseFloat("43.2499237"),Float.parseFloat("-3.4108149"),"Relux");
         Excursion exc3 = new Excursion(3,"Faro del Caballo", "Excursión muy bonita para ver todos los acantilados del monte Buciero de Santoña. Ideal para ir en pareja y para pasar el día.", "Medio", 12,"Santoña",Float.parseFloat("43.4514626"),Float.parseFloat("-3.4256904"),"Caballo");
         Excursion exc4 = new Excursion(4,"Gorbea", "Subida preciosa a uno de los montes más característicos de Bizkaia. Recorrido un poco duro pero el paisaje merece la pena.", "Dificil", 12,"Areatza",Float.parseFloat("43.0350000"),Float.parseFloat("-2.7798800"),"Gorbea");
+
         arrExcursiones = new ArrayList<Excursion>();
         arrExcursiones.add(exc1);
         arrExcursiones.add(exc2);
         arrExcursiones.add(exc3);
         arrExcursiones.add(exc4);
+
+        arrExcursionesFiltered = new ArrayList<Excursion>();
+        arrExcursionesFiltered.add(exc1);
+        arrExcursionesFiltered.add(exc2);
+        arrExcursionesFiltered.add(exc3);
+        arrExcursionesFiltered.add(exc4);
     }
 }
