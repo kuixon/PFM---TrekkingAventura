@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -38,6 +39,7 @@ import java.util.Locale;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
+import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.utilities.ImageHelper;
 
 import static android.app.Activity.RESULT_OK;
@@ -49,16 +51,24 @@ public class FormExcursionesFragment extends Fragment implements
     // Este atributo nos servirá para saber la posición del item seleccionado de la lista
     // desplegable.
     public static final String ARG_FORM_EXCURSIONES = "form_excursiones";
+    public static final String FORM_EXCURSION_KEY = "form_excursion_key";
     public static final int IMG_FROM_CAMERA = 1;
     public static final int IMG_FROM_GALLERY = 2;
 
     private GoogleApiClient mGoogleApiClient;
 
-    private Button btnGeolocate;
-    private Button btnAddImage;
+    private Excursion excursion;
+
+    private EditText edtName;
+    private EditText edtDescription;
+    private EditText edtLocation;
+    private EditText edtDistance;
+    private RadioGroup rdgLevel;
     private EditText edtLatitude;
     private EditText edtLongitude;
-    private EditText edtLocation;
+    private Button btnGeolocate;
+    private Button btnAddImage;
+
     private TextView txtImage;
     private ImageButton deleteSelectedImg;
 
@@ -82,9 +92,14 @@ public class FormExcursionesFragment extends Fragment implements
         // Ponemos esta opción a true para poder inflar el menu en la Toolbar.
         setHasOptionsMenu(true);
 
+        edtName = (EditText) rootView.findViewById(R.id.edtName);
+        edtDescription = (EditText) rootView.findViewById(R.id.edtDescription);
+        edtLocation = (EditText) rootView.findViewById(R.id.edtLocation);
+        edtDistance = (EditText) rootView.findViewById(R.id.edtDistance);
+        rdgLevel = (RadioGroup) rootView.findViewById(R.id.radioGroup);
         edtLatitude = (EditText) rootView.findViewById(R.id.edtLatitude);
         edtLongitude = (EditText) rootView.findViewById(R.id.edtLongitude);
-        edtLocation = (EditText) rootView.findViewById(R.id.edtLocation);
+
         txtImage = (TextView) rootView.findViewById(R.id.txtImage);
 
         btnGeolocate = (Button) rootView.findViewById(R.id.button_geolocate);
@@ -113,7 +128,32 @@ public class FormExcursionesFragment extends Fragment implements
             }
         });
 
+        excursion = (Excursion) getArguments().getSerializable(FORM_EXCURSION_KEY);
+        if (excursion != null) {
+            initializeFields(excursion);
+        }
+
         return rootView;
+    }
+
+    private void initializeFields(Excursion excursion) {
+        edtName.setText(excursion.getName());
+        edtDescription.setText(excursion.getOpinion());
+        edtLocation.setText(excursion.getLocation());
+        edtDistance.setText(Double.toString(excursion.getTravelDistance()));
+        switch (excursion.getLevel()) {
+            case "Facil":
+                rdgLevel.check(R.id.button_level_low);
+                break;
+            case "Medio":
+                rdgLevel.check(R.id.button_level_medium);
+                break;
+            case "Dificil":
+                rdgLevel.check(R.id.button_level_high);
+                break;
+        }
+        edtLatitude.setText(Float.toString(excursion.getLatitude()));
+        edtLongitude.setText(Float.toString(excursion.getLongitude()));
     }
 
     @Override
@@ -147,11 +187,15 @@ public class FormExcursionesFragment extends Fragment implements
             args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
             fragment.setArguments(args);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            return true;
         } else if (id == R.id.mnu_create_exc) {
-            // Se tendría que crear la excursión y almacenarla en la BDD del servidor.
-        }
 
-        return super.onOptionsItemSelected(item);
+            // En este punto, se tendría que crear la excursión y almacenarla en la BDD del servidor.
+
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     public void geolocate(View v) {

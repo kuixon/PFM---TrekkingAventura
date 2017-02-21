@@ -16,6 +16,8 @@
     <string name="add_excursion">Añadir Excursión</string>
     <string name="search_excursion">Buscar Excursión</string>
     <string name="create_excursion">Crear Excursión</string>
+    <string name="edit_excursion">Editar Excursión</string>
+    <string name="delete_excursion">Eliminar Excursión</string>
     <string name="cancel_excursion">Cancelar</string>
     <string name="label_excursion_name">Nombre</string>
     <string name="label_excursion_opinion">Descripción/Opinión</string>

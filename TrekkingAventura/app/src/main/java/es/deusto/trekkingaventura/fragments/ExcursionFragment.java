@@ -7,11 +7,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -28,6 +32,7 @@ import es.deusto.trekkingaventura.utilities.WeatherHttpClient;
 public class ExcursionFragment extends Fragment {
 
     public static final String EXCURSION_KEY = "excursion_key";
+
     private Excursion excursion;
 
     private ImageView imgExc;
@@ -135,6 +140,41 @@ public class ExcursionFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.excursion, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.mnu_edit_exc) {
+            Fragment fragment = new FormExcursionesFragment();
+            Bundle args = new Bundle();
+            args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES, "Formulario");
+            args.putSerializable(FormExcursionesFragment.FORM_EXCURSION_KEY, excursion);
+            fragment.setArguments(args);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            return true;
+        } else if (id == R.id.mnu_delete_exc) {
+
+            // Se elimina en este punto la excursión en cuestión
+
+            Toast.makeText(getContext(), "La excursión '" + excursion.getName() + "' ha sido eliminada.", Toast.LENGTH_SHORT).show();
+
+            Fragment fragment = new MisExcursionesFragment();
+            Bundle args = new Bundle();
+            args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
+            fragment.setArguments(args);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     private class JSONWeatherTask extends AsyncTask<String, Void, Weather> {

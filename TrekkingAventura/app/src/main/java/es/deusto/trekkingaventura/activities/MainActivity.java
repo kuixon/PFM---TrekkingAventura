@@ -117,13 +117,17 @@ public class MainActivity extends AppCompatActivity {
             if (id == R.id.mnu_add) {
                 Fragment fragment = new FormExcursionesFragment();
                 Bundle args = new Bundle();
+                args.putSerializable(FormExcursionesFragment.FORM_EXCURSION_KEY, null);
                 args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES, "Formulario");
                 fragment.setArguments(args);
                 getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+                return true;
+            } else {
+                return super.onOptionsItemSelected(item);
             }
+        } else {
+            return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     // Este listener redireccionará las peticiones que se realicen sobre cada uno de los
