@@ -126,8 +126,13 @@ public class ExcursionFragment extends Fragment {
 
         // Se realiza la petición a la API del tiempo.
         String city = excursion.getLocation();
+        String cityWithoutSpaces = city.replace(" ", "%20");
         JSONWeatherTask task = new JSONWeatherTask();
-        task.execute(new String[]{city});
+        if (cityWithoutSpaces.contains("%20")) {
+            task.execute(new String[]{cityWithoutSpaces});
+        } else {
+            task.execute(new String[]{city});
+        }
 
         return rootView;
     }
@@ -151,6 +156,7 @@ public class ExcursionFragment extends Fragment {
                 }
             } else {
                 Log.i("Error", "la API no ha devuelto ningun valor");
+                weather = null;
             }
 
             return weather;
