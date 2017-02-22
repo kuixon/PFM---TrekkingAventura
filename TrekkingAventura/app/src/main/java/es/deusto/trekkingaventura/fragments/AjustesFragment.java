@@ -1,8 +1,12 @@
 package es.deusto.trekkingaventura.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +28,7 @@ public class AjustesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Obtenemos el nombre del elemento de la lista seleccionado.
         View rootView = inflater.inflate(R.layout.fragment_ajustes, container, false);
         int i = getArguments().getInt(ARG_AJUSTES_NUMBER);

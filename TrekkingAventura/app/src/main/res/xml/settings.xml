@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/settings_category_filter">
+        <EditTextPreference android:key="distance" android:title="@string/settings_distance"
+            android:summary="@string/settings_distance_sumary" android:inputType="numberDecimal" />
+        <SwitchPreference android:key="filter" android:title="@string/settings_filter" android:summaryOn="@string/settings_sumary_on"
+            android:summaryOff="@string/settings_sumary_off" android:defaultValue="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

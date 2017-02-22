@@ -33,4 +33,11 @@
     <string name="button_geolocate">Geolocalizar</string>
     <string name="button_add_image">Añadir imagen</string>
     <string name="search_hint">Filtra por nombre...</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_category_filter">Filtrado excursiones</string>
+    <string name="settings_distance">Distancia (m)</string>
+    <string name="settings_distance_sumary">Introduce la distancia máxima</string>
+    <string name="settings_filter">Filtro por distancia</string>
+    <string name="settings_sumary_on">On</string>
+    <string name="settings_sumary_off">Off</string>
 </resources>

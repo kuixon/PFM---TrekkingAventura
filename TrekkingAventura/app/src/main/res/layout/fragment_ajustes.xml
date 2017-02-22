@@ -4,19 +4,4 @@
     android:layout_width="match_parent"
     android:padding="10dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Fragment Ajustes"
-        android:id="@+id/headline"
-        android:layout_centerHorizontal="true" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/headline"
-        android:src="@drawable/app_icon" />
 </RelativeLayout>

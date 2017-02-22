@@ -21,6 +21,7 @@ import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.adapters.DrawerListAdapter;
 import es.deusto.trekkingaventura.fragments.AjustesFragment;
 import es.deusto.trekkingaventura.fragments.BuscarExcursionesFragment;
+import es.deusto.trekkingaventura.fragments.FilterSettingsFragment;
 import es.deusto.trekkingaventura.fragments.FormExcursionesFragment;
 import es.deusto.trekkingaventura.fragments.MisExcursionesFragment;
 import es.deusto.trekkingaventura.entities.DrawerItem;
@@ -175,6 +176,10 @@ public class MainActivity extends AppCompatActivity {
             // por el del fragment.
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        }
+
+        if (position == 2) {
+            getFragmentManager().beginTransaction().replace(R.id.content_frame, new FilterSettingsFragment()).commit();
         }
 
         // Se actualiza el item seleccionado y el título, después de cerrar el drawer
