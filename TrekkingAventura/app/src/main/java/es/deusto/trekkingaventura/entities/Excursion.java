@@ -13,8 +13,9 @@ public class Excursion implements Serializable{
     private float latitude;
     private float longitude;
     private String imgPath;
+    private boolean notifications;
 
-    public Excursion(int id, String name, String opinion, String level, double travelDistance, String location, float latitude, float longitude, String imgPath) {
+    public Excursion(int id, String name, String opinion, String level, double travelDistance, String location, float latitude, float longitude, String imgPath, boolean notifications) {
         this.id = id;
         this.name = name;
         this.opinion = opinion;
@@ -24,6 +25,7 @@ public class Excursion implements Serializable{
         this.latitude = latitude;
         this.longitude = longitude;
         this.imgPath = imgPath;
+        this.notifications = notifications;
     }
 
     public int getId() {
@@ -98,6 +100,14 @@ public class Excursion implements Serializable{
         this.imgPath = imgPath;
     }
 
+    public boolean isNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(boolean notifications) {
+        this.notifications = notifications;
+    }
+
     @Override
     public String toString() {
         return "Excursion{" +
@@ -110,6 +120,7 @@ public class Excursion implements Serializable{
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", imgPath='" + imgPath + '\'' +
+                ", notifications=" + notifications +
                 '}';
     }
 }
