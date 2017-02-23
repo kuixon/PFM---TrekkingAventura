@@ -1,8 +1,15 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -15,13 +22,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
 import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.adapters.ExcursionListAdapter;
 import es.deusto.trekkingaventura.entities.Excursion;
 
-public class MisExcursionesFragment extends Fragment {
+public class MisExcursionesFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener{
 
     // Este atributo nos servirá para saber la posición del item seleccionado de la lista
     // desplegable.
@@ -31,6 +44,12 @@ public class MisExcursionesFragment extends Fragment {
     private ArrayList<Excursion> arrExcursiones;
     private ArrayList<Excursion> arrExcursionesFiltered;
     private ExcursionListAdapter adpExcursiones;
+
+    private SharedPreferences sharedPref;
+    private double distance;
+    private boolean filter;
+
+    private GoogleApiClient mGoogleApiClient;
 
     public MisExcursionesFragment() {
 
@@ -60,6 +79,8 @@ public class MisExcursionesFragment extends Fragment {
         adpExcursiones = new ExcursionListAdapter(getContext(), R.layout.excursion_list_adapter, arrExcursionesFiltered);
         listExcursiones.setAdapter(adpExcursiones);
 
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         listExcursiones.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -70,6 +91,15 @@ public class MisExcursionesFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
         });
+
+        String distanceText = sharedPref.getString("distance", "");
+        if (distanceText != null && !distanceText.equals("")) {
+            distance = Double.parseDouble(distanceText) * 1000;
+        } else {
+            distance = 0;
+        }
+
+        filter = sharedPref.getBoolean("filter", false);
 
         return rootView;
     }
@@ -157,5 +187,102 @@ public class MisExcursionesFragment extends Fragment {
         arrExcursionesFiltered.add(exc2);
         arrExcursionesFiltered.add(exc3);
         arrExcursionesFiltered.add(exc4);
+    }
+
+    private Location getUserLocation() {
+        Location userLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        return userLocation;
+    }
+
+    private void applyFilter(Location userLocation) {
+        final ArrayList<Excursion> arrFilteredExcursiones = arrExcursionesFiltered;
+        arrExcursiones = new ArrayList<Excursion>();
+
+        Location excursionLocation = new Location("");
+        for (Excursion e : arrFilteredExcursiones) {
+            excursionLocation.setLatitude(e.getLatitude());
+            excursionLocation.setLongitude(e.getLongitude());
+            Log.i("Distancia", Float.toString(excursionLocation.distanceTo(userLocation)));
+            if (excursionLocation.distanceTo(userLocation) <= distance) {
+                arrExcursiones.add(e);
+            }
+        }
+
+        arrExcursionesFiltered = new ArrayList<Excursion>(arrExcursiones);
+
+        adpExcursiones = new ExcursionListAdapter(getContext(), R.layout.excursion_list_adapter, arrExcursionesFiltered);
+
+        listExcursiones.setAdapter(adpExcursiones);
+    }
+
+    private boolean connectToGooglePlayServices(){
+        if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext()) != ConnectionResult.SUCCESS){
+            return false;
+        }
+
+        mGoogleApiClient =  new GoogleApiClient.Builder(getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        mGoogleApiClient.connect();
+        return true;
+    }
+
+    private void disconnectFromGooglePlayServices(){
+        if(mGoogleApiClient.isConnected()){
+            mGoogleApiClient.disconnect();
+            Log.i("Location client", "Disconnected");
+        }
+    }
+
+    public void showMessageDialog(String str) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(str);
+        builder.setCancelable(false);
+        builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!connectToGooglePlayServices()) {
+            showMessageDialog("Google Play Services are not available in this device");
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disconnectFromGooglePlayServices();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i("Location client", "Connected");
+
+        if (filter && distance > 0) {
+            Location userLocation = getUserLocation();
+            applyFilter(userLocation);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i("Location client", "Connection suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        showMessageDialog("Internet connection is not available");
     }
 }

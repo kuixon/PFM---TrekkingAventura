@@ -1,7 +1,6 @@
 package es.deusto.trekkingaventura.activities;
 
 import android.content.res.Configuration;
-import android.location.Location;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -19,7 +18,8 @@ import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.adapters.DrawerListAdapter;
-import es.deusto.trekkingaventura.fragments.AjustesFragment;
+import es.deusto.trekkingaventura.fragments.EmptyAppFragment;
+import es.deusto.trekkingaventura.fragments.EmptyFragment;
 import es.deusto.trekkingaventura.fragments.BuscarExcursionesFragment;
 import es.deusto.trekkingaventura.fragments.FilterSettingsFragment;
 import es.deusto.trekkingaventura.fragments.FormExcursionesFragment;
@@ -149,6 +149,10 @@ public class MainActivity extends AppCompatActivity {
         // Declaramos los argumentos que le pasaremos como parámetro al fragment.
         Bundle args = new Bundle();
 
+        // Inicializamos los paneles vacios (este paso sirve para borrar/eliminar el fragment que estaba en uso.
+        getFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyAppFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyFragment()).commit();
+
         // Inicializamos el fragment dependiendo de la posición de la lista desplegable que se
         // haya clickado. Además, le pasamos como parámetro al fragment la posición del elemento
         // de la lista desplegable clickado.
@@ -164,9 +168,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment.setArguments(args);
                 break;
             case 2:
-                fragment = new AjustesFragment();
-                args.putInt(AjustesFragment.ARG_AJUSTES_NUMBER, position);
-                fragment.setArguments(args);
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, new FilterSettingsFragment()).commit();
+                fragment = null;
                 break;
             default: fragment = null;
         }
@@ -176,10 +179,6 @@ public class MainActivity extends AppCompatActivity {
             // por el del fragment.
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-        }
-
-        if (position == 2) {
-            getFragmentManager().beginTransaction().replace(R.id.content_frame, new FilterSettingsFragment()).commit();
         }
 
         // Se actualiza el item seleccionado y el título, después de cerrar el drawer
