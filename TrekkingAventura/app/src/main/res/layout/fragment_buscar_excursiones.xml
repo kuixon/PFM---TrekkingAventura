@@ -1,22 +1,91 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:padding="10dp">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/edName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/label_excursion_name"
+        android:ems="10"
+        android:layout_marginBottom="5sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1"
+        android:layout_marginBottom="5sp">
+
+        <EditText
+            android:id="@+id/edLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/label_excursion_location"
+            android:ems="10"
+            android:layout_weight="0.5"/>
+
+        <EditText
+            android:id="@+id/edDistance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:hint="@string/label_excursion_distance"
+            android:layout_weight="0.1" />
+
+    </LinearLayout>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:text="@string/label_excursion_level"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Fragment Buscar Excursiones"
-        android:id="@+id/headline"
-        android:layout_centerHorizontal="true" />
+        android:textSize="24sp"
+        android:textColor="@android:color/background_dark"
+        android:textAlignment="center"
+        android:layout_marginBottom="5sp" />
 
-    <ImageView
-        android:layout_width="wrap_content"
+    <RadioGroup
+        android:id="@+id/rGroup"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/headline"
-        android:src="@drawable/app_icon" />
-</RelativeLayout>
+        android:orientation="horizontal"
+        android:weightSum="1.2"
+        android:layout_marginBottom="5sp">
+
+        <RadioButton
+            android:id="@+id/b_level_low"
+            android:text="@string/label_excursion_level_low"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"/>
+
+        <RadioButton
+            android:id="@+id/b_level_medium"
+            android:text="@string/label_excursion_level_medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"/>
+
+        <RadioButton
+            android:id="@+id/b_level_high"
+            android:text="@string/label_excursion_level_high"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"/>
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/button_find"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_find"
+        android:textAlignment="center"
+        android:nestedScrollingEnabled="false"
+        android:background="@color/colorPrimary"
+        android:textColor="#ffffff"
+        android:onClick="find" />
+
+</LinearLayout>

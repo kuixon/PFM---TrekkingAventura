@@ -4,18 +4,30 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import es.deusto.trekkingaventura.R;
+import es.deusto.trekkingaventura.entities.Excursion;
 
 public class BuscarExcursionesFragment extends Fragment {
 
     // Este atributo nos servirá para saber la posición del item seleccionado de la lista
     // desplegable.
     public static final String ARG_BUSCAR_EXCURSIONES_NUMBER = "buscar_excursiones_number";
+
+    private EditText edtName;
+    private EditText edtLocation;
+    private EditText edtDistance;
+    private RadioGroup rdgLevel;
+    private Button btnFind;
 
     public BuscarExcursionesFragment() {
 
@@ -33,6 +45,47 @@ public class BuscarExcursionesFragment extends Fragment {
         // a un método de la actividad llamado setTitle.
         getActivity().setTitle(nameItemSelected);
 
+        // Ponemos esta opción a true para poder inflar el menu en la Toolbar.
+        setHasOptionsMenu(true);
+
+        edtName = (EditText) rootView.findViewById(R.id.edName);
+        edtLocation = (EditText) rootView.findViewById(R.id.edLocation);
+        edtDistance = (EditText) rootView.findViewById(R.id.edDistance);
+        rdgLevel = (RadioGroup) rootView.findViewById(R.id.rGroup);
+
+        btnFind = (Button) rootView.findViewById(R.id.button_find);
+        btnFind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                find(v);
+            }
+        });
+
         return rootView;
+    }
+
+    public void find(View v) {
+        // En este punto se realizaría la búsqueda.
+
+        // INICIO - Toast provisional
+        String level = "";
+        switch (rdgLevel.getCheckedRadioButtonId()) {
+            case R.id.b_level_low:
+                level = "Fácil";
+                break;
+            case R.id.b_level_medium:
+                level = "Medio";
+                break;
+            case R.id.b_level_high:
+                level = "Difícil";
+                break;
+        }
+        Toast.makeText(getContext(), "Buscar excursión con:"
+                + "\n - Nombre: '" + edtName.getText() + "'"
+                + "\n - Lugar: '" + edtLocation.getText() + "'"
+                + "\n - Distancia: '" + edtDistance.getText() + "'"
+                + "\n - Nivel: '" + level + "'",
+                Toast.LENGTH_LONG).show();
+        // FIN - Toast provisional
     }
 }
