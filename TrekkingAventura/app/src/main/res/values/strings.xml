@@ -41,4 +41,8 @@
     <string name="settings_filter">Filtro por distancia</string>
     <string name="settings_sumary_on">On</string>
     <string name="settings_sumary_off">Off</string>
+    <string name="settings_notifications_category">Notificaciones</string>
+    <string name="settings_notifications">Notificaciones mal tiempo</string>
+    <string name="settings_notifications_excursion">Excursión</string>
+    <string name="settings_notifications_excursion_sumary">Selecciona una excursión...</string>
 </resources>

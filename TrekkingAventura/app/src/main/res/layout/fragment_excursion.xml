@@ -330,22 +330,6 @@
                     android:textAlignment="viewEnd"
                     android:paddingBottom="5dp" />
             </LinearLayout>
-            <TextView
-                android:text="Notificaciones mal tiempo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/txtAlerta"
-                android:textAlignment="center"
-                android:textStyle="normal|bold"
-                android:textSize="24sp"
-                android:textColor="@android:color/black"
-                android:paddingBottom="5dp"/>
-
-            <ToggleButton
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/toggleNotifications"
-                android:onClick="throwNotificationMessage" />
 
         </LinearLayout>
     </ScrollView>

@@ -6,4 +6,9 @@
         <SwitchPreference android:key="filter" android:title="@string/settings_filter" android:summaryOn="@string/settings_sumary_on"
             android:summaryOff="@string/settings_sumary_off" android:defaultValue="false" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_notifications_category">
+        <ListPreference android:key="excursiones" android:title="@string/settings_notifications_excursion" android:summary="@string/settings_notifications_excursion_sumary" />
+        <SwitchPreference android:key="notifications" android:title="@string/settings_notifications" android:summaryOn="@string/settings_sumary_on"
+            android:summaryOff="@string/settings_sumary_off" android:defaultValue="false" />
+    </PreferenceCategory>
 </PreferenceScreen>

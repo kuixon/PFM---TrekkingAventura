@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import org.json.JSONException;
 
@@ -58,9 +57,6 @@ public class ExcursionFragment extends Fragment {
     private LinearLayout panelTiempo;
     private LinearLayout panelTiempoNoDisponible;
 
-    // Notificaciones mal tiempo
-    private ToggleButton toggleNotifications;
-
     public ExcursionFragment() {
 
     }
@@ -100,23 +96,6 @@ public class ExcursionFragment extends Fragment {
         imgView = (ImageView) rootView.findViewById(R.id.condIcon);
         panelTiempo = (LinearLayout) rootView.findViewById(R.id.panelTiempo);
         panelTiempoNoDisponible = (LinearLayout) rootView.findViewById(R.id.panelTiempoNoDisponible);
-
-        // Notificaciones mal tiempo
-        toggleNotifications = (ToggleButton) rootView.findViewById(R.id.toggleNotifications);
-        toggleNotifications.setActivated(excursion.isNotifications());
-        toggleNotifications.setChecked(excursion.isNotifications());
-        toggleNotifications.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (toggleNotifications.isActivated()) {
-                    excursion.setNotifications(false);
-                } else {
-                    excursion.setNotifications(true);
-                }
-                toggleNotifications.setActivated(excursion.isNotifications());
-                throwNotificationMessage(v);
-            }
-        });
 
         switch (excursion.getImgPath()) {
             case "Cares":
@@ -207,18 +186,6 @@ public class ExcursionFragment extends Fragment {
             return true;
         } else {
             return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public void throwNotificationMessage(View v) {
-        if (toggleNotifications.isActivated()) {
-            Toast.makeText(getContext(),
-                    "*Notificaciones ACTIVADAS* \nA partir de ahora recibiras una notificación cuando haga mal tiempo en:" +
-                            " '" + excursion.getLocation() + "'.", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getContext(),
-                    "*Notificaciones DESACTIVADAS* \nA partir de ahora NO recibiras una notificación cuando haga mal tiempo en:" +
-                            " '" + excursion.getLocation() + "'.", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,10 +19,12 @@ import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.adapters.DrawerListAdapter;
+import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.fragments.EmptyAppFragment;
 import es.deusto.trekkingaventura.fragments.EmptyFragment;
 import es.deusto.trekkingaventura.fragments.BuscarExcursionesFragment;
-import es.deusto.trekkingaventura.fragments.FilterSettingsFragment;
+import es.deusto.trekkingaventura.fragments.ExcursionFragment;
+import es.deusto.trekkingaventura.fragments.AjustesFragment;
 import es.deusto.trekkingaventura.fragments.FormExcursionesFragment;
 import es.deusto.trekkingaventura.fragments.MisExcursionesFragment;
 import es.deusto.trekkingaventura.entities.DrawerItem;
@@ -42,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
     private CharSequence activityTitle;
     private CharSequence itemTitle;
     private String[] tagTitles;
+
+    // Para cuando se accede desde una notificación
+    public static final String ARG_NOTIFICATION_EXC = "arg_notification_exc";
+    public static final String ARG_NOTIFICATION_FRAG = "arg_notification_frag";
+    public static final String ARG_NOTIFICATION_FRAG_CONTENT = "arg_notification_frag_content";
+    private Excursion excursion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +115,25 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             selectItem(0);
         }
+
+        Log.i("INFO_NOT", "Se entra a MainActivity tras clickar la notificacion");
+        // Cuando llegamos a esta actividad desde una notificación
+        if (getIntent().getStringExtra(ARG_NOTIFICATION_FRAG) != null) {
+            Log.i("INFO_NOT", "Se lee correctamente el parámetro ARG_NOTIFICATION_FRAG desde MainActivity");
+            if (getIntent().getStringExtra(ARG_NOTIFICATION_FRAG).equals(ARG_NOTIFICATION_FRAG_CONTENT)) {
+                Log.i("INFO_NOT", "Se lee correctamente el parámetro ARG_NOTIFICATION_FRAG_CONTENT desde MainActivity");
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyAppFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyFragment()).commit();
+
+                Fragment fragment = new ExcursionFragment();
+                Bundle args = new Bundle();
+                args.putSerializable(ExcursionFragment.EXCURSION_KEY, getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC));
+                fragment.setArguments(args);
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            }
+        } else {
+            Log.i("INFO_NOT", "NO se lee correctamente el parámetro ARG_NOTIFICATION_FRAG desde MainActivity");
+        }
     }
 
     @Override
@@ -168,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment.setArguments(args);
                 break;
             case 2:
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, new FilterSettingsFragment()).commit();
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, new AjustesFragment()).commit();
                 fragment = null;
                 break;
             default: fragment = null;
