@@ -1,5 +1,6 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -26,10 +27,14 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
     private boolean notifications_enabled;
     private Excursion excursion;
 
+    private Activity activity;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
+
+        activity = getActivity();
 
         arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_MIS_EXCURSIONES);
 
@@ -98,16 +103,16 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
                 if (excursion != null) {
                     NotificationService.getInstance(getActivity()).setExcursion(excursion);
                     NotificationService.getInstance(getActivity()).startAlarm();
-                    Toast.makeText(getActivity(),
+                    Toast.makeText(activity,
                             "*Notificaciones ACTIVADAS* \nA partir de ahora recibiras una notificación cuando haga mal tiempo en" +
                                     " el lugar de la excursión seleccionada.", Toast.LENGTH_LONG).show();
                 }
             } else {
                 notifications_enabled = false;
                 NotificationService.getInstance(getActivity()).stopAlarm();
-                Toast.makeText(getActivity(),
+                Toast.makeText(activity,
                         "*Notificaciones DESACTIVADAS* \nA partir de ahora NO recibiras una notificación cuando haga mal tiempo en" +
-                                    " el lugar de la excursión seleccionada.", Toast.LENGTH_LONG).show();
+                                " el lugar de la excursión seleccionada.", Toast.LENGTH_LONG).show();
             }
         }
     }
