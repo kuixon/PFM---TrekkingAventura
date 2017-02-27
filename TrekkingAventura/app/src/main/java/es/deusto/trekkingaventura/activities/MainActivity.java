@@ -46,16 +46,20 @@ public class MainActivity extends AppCompatActivity {
     private CharSequence itemTitle;
     private String[] tagTitles;
 
+    private ArrayList<Excursion> arrExcursiones;
+
     // Para cuando se accede desde una notificación
     public static final String ARG_NOTIFICATION_EXC = "arg_notification_exc";
     public static final String ARG_NOTIFICATION_FRAG = "arg_notification_frag";
     public static final String ARG_NOTIFICATION_FRAG_CONTENT = "arg_notification_frag_content";
-    private Excursion excursion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Inicializamos la lista de excursiones
+        createExcursionList();
 
         // Ponemos nuestra Toolbar personalizada como action bar.
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -189,15 +193,20 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 fragment = new MisExcursionesFragment();
                 args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, position);
+                args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
                 fragment.setArguments(args);
                 break;
             case 1:
                 fragment = new BuscarExcursionesFragment();
                 args.putInt(BuscarExcursionesFragment.ARG_BUSCAR_EXCURSIONES_NUMBER, position);
+                args.putSerializable(BuscarExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
                 fragment.setArguments(args);
                 break;
             case 2:
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, new AjustesFragment()).commit();
+                AjustesFragment ajustesFragment = new AjustesFragment();
+                args.putSerializable(AjustesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
+                ajustesFragment.setArguments(args);
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, ajustesFragment).commit();
                 fragment = null;
                 break;
             default: fragment = null;
@@ -227,5 +236,20 @@ public class MainActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         // Cambiamos las configuraciones del drawer si hubo modificaciones
         drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private void createExcursionList() {
+
+        // Creamos tres excursiones de prueba y las metemos al array de Excursiones.
+        Excursion exc1 = new Excursion(1,"Ruta del Cares", "Un sitio espectacular con unas vistas impresionantes. Ideal para ir con la familia y para sacar fotos de los acantilados.", "Medio", 12,"Arenas de Cabrales",Float.parseFloat("43.2551652"),Float.parseFloat("-4.8366377"),"Cares", false);
+        Excursion exc2 = new Excursion(2,"Ventana Relux", "Unas vistas impresionantes desde la ventana. Una caída libre espectacular que merece ser fotografiada. Ideal para la familia.", "Facil", 2.7,"Karrantza Harana",Float.parseFloat("43.2499237"),Float.parseFloat("-3.4108149"),"Relux", false);
+        Excursion exc3 = new Excursion(3,"Faro del Caballo", "Excursión muy bonita para ver todos los acantilados del monte Buciero de Santoña. Ideal para ir en pareja y para pasar el día.", "Medio", 12,"Santoña",Float.parseFloat("43.4514626"),Float.parseFloat("-3.4256904"),"Caballo", false);
+        Excursion exc4 = new Excursion(4,"Gorbea", "Subida preciosa a uno de los montes más característicos de Bizkaia. Recorrido un poco duro pero el paisaje merece la pena.", "Dificil", 12,"Areatza",Float.parseFloat("43.0350000"),Float.parseFloat("-2.7798800"),"Gorbea", false);
+
+        arrExcursiones = new ArrayList<Excursion>();
+        arrExcursiones.add(exc1);
+        arrExcursiones.add(exc2);
+        arrExcursiones.add(exc3);
+        arrExcursiones.add(exc4);
     }
 }

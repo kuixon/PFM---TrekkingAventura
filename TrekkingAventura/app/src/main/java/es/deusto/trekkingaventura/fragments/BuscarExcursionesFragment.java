@@ -1,18 +1,18 @@
 package es.deusto.trekkingaventura.fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.analytics.ExceptionReporter;
+
+import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
@@ -22,6 +22,9 @@ public class BuscarExcursionesFragment extends Fragment {
     // Este atributo nos servirá para saber la posición del item seleccionado de la lista
     // desplegable.
     public static final String ARG_BUSCAR_EXCURSIONES_NUMBER = "buscar_excursiones_number";
+    public static final String ARG_MIS_EXCURSIONES = "mis_excursiones";
+
+    private ArrayList<Excursion> arrExcursiones;
 
     private EditText edtName;
     private EditText edtLocation;
@@ -47,6 +50,8 @@ public class BuscarExcursionesFragment extends Fragment {
 
         // Ponemos esta opción a true para poder inflar el menu en la Toolbar.
         setHasOptionsMenu(true);
+
+        arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_MIS_EXCURSIONES);
 
         edtName = (EditText) rootView.findViewById(R.id.edName);
         edtLocation = (EditText) rootView.findViewById(R.id.edLocation);

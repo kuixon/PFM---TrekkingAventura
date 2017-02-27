@@ -19,6 +19,8 @@ import es.deusto.trekkingaventura.notifications.NotificationService;
 
 public class AjustesFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    public static final String ARG_MIS_EXCURSIONES = "mis_excursiones";
+
     private SharedPreferences sharedPreferences;
     private ArrayList<Excursion> arrExcursiones;
     private boolean notifications_enabled;
@@ -29,8 +31,7 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
 
-        // La inicialización de 'excursiones' es momentánea (hasta dotar a los datos de la app de persistencia)
-        createExcursionList();
+        arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_MIS_EXCURSIONES);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -109,21 +110,6 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
                                     " el lugar de la excursión seleccionada.", Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    private void createExcursionList() {
-
-        // Creamos tres excursiones de prueba y las metemos al array de Excursiones.
-        Excursion exc1 = new Excursion(1,"Ruta del Cares", "Un sitio espectacular con unas vistas impresionantes. Ideal para ir con la familia y para sacar fotos de los acantilados.", "Medio", 12,"Arenas de Cabrales",Float.parseFloat("43.2551652"),Float.parseFloat("-4.8366377"),"Cares", false);
-        Excursion exc2 = new Excursion(2,"Ventana Relux", "Unas vistas impresionantes desde la ventana. Una caída libre espectacular que merece ser fotografiada. Ideal para la familia.", "Facil", 2.7,"Karrantza Harana",Float.parseFloat("43.2499237"),Float.parseFloat("-3.4108149"),"Relux", false);
-        Excursion exc3 = new Excursion(3,"Faro del Caballo", "Excursión muy bonita para ver todos los acantilados del monte Buciero de Santoña. Ideal para ir en pareja y para pasar el día.", "Medio", 12,"Santoña",Float.parseFloat("43.4514626"),Float.parseFloat("-3.4256904"),"Caballo", false);
-        Excursion exc4 = new Excursion(4,"Gorbea", "Subida preciosa a uno de los montes más característicos de Bizkaia. Recorrido un poco duro pero el paisaje merece la pena.", "Dificil", 12,"Areatza",Float.parseFloat("43.0350000"),Float.parseFloat("-2.7798800"),"Gorbea", false);
-
-        arrExcursiones = new ArrayList<Excursion>();
-        arrExcursiones.add(exc1);
-        arrExcursiones.add(exc2);
-        arrExcursiones.add(exc3);
-        arrExcursiones.add(exc4);
     }
 
     private Excursion getExcursionById(int id) {
