@@ -13,7 +13,7 @@ import es.deusto.trekkingaventura.entities.Excursion;
  */
 
 public class NotificationService {
-    private static int TIME = 15;
+    private static int TIME = 900;
     private static NotificationService instance;
     private Context context;
     private AlarmManager alarmManager;

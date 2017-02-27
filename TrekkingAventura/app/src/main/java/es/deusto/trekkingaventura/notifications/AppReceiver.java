@@ -65,12 +65,11 @@ public class AppReceiver extends BroadcastReceiver {
     private void sendNotification(Excursion excursion) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(MainActivity.ARG_NOTIFICATION_EXC, excursion);
-        intent.putExtra(MainActivity.ARG_NOTIFICATION_FRAG, MainActivity.ARG_NOTIFICATION_FRAG_CONTENT);
-        intent.setAction(Intent.ACTION_MAIN);
+        intent.setAction("OPEN_EXC_FRAGMENT");
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder notification  = new NotificationCompat.Builder(this.context)
                 .setContentTitle("Mal tiempo en '" + excursion.getLocation() + "'.")
                 .setContentText("El tiempo actual en '" + excursion.getLocation() + "' es: '" + currentCondition + "'.")
