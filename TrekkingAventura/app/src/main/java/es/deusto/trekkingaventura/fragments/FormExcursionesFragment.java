@@ -50,7 +50,8 @@ public class FormExcursionesFragment extends Fragment implements
 
     // Este atributo nos servirá para saber la posición del item seleccionado de la lista
     // desplegable.
-    public static final String ARG_FORM_EXCURSIONES = "form_excursiones";
+    public static final String ARG_FORM_EXCURSIONES_TITLE = "form_excursiones_title";
+    public static final String ARG_FORM_EXCURSIONES_SOURCE = "form_excursiones_source";
     public static final String FORM_EXCURSION_KEY = "form_excursion_key";
     public static final int IMG_FROM_CAMERA = 1;
     public static final int IMG_FROM_GALLERY = 2;
@@ -83,7 +84,7 @@ public class FormExcursionesFragment extends Fragment implements
                              Bundle savedInstanceState) {
         // Obtenemos el nombre del elemento de la lista seleccionado.
         View rootView = inflater.inflate(R.layout.fragment_form_excursiones, container, false);
-        String name = getArguments().getString(ARG_FORM_EXCURSIONES);
+        String name = getArguments().getString(ARG_FORM_EXCURSIONES_TITLE);
 
         // Le cambiamos el título a la actividad (al cambiar el título, estaremos llamando
         // a un método de la actividad llamado setTitle.
@@ -182,11 +183,21 @@ public class FormExcursionesFragment extends Fragment implements
         int id = item.getItemId();
 
         if (id == R.id.mnu_cancel_create_exc) {
-            Fragment fragment = new MisExcursionesFragment();
-            Bundle args = new Bundle();
-            args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
-            fragment.setArguments(args);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            if (getArguments().getString(ARG_FORM_EXCURSIONES_SOURCE) != null &&
+                    getArguments().getString(ARG_FORM_EXCURSIONES_SOURCE).equals("Mis Excursiones")) {
+                Fragment fragment = new MisExcursionesFragment();
+                Bundle args = new Bundle();
+                args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
+                fragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            } else {
+                Fragment fragment = new ExcursionFragment();
+                Bundle args = new Bundle();
+                args.putSerializable(ExcursionFragment.EXCURSION_KEY, excursion);
+                fragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            }
+
             return true;
         } else if (id == R.id.mnu_create_exc) {
 

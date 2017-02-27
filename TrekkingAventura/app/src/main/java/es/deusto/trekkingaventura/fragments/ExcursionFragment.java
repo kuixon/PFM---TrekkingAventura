@@ -167,7 +167,8 @@ public class ExcursionFragment extends Fragment {
         if (id == R.id.mnu_edit_exc) {
             Fragment fragment = new FormExcursionesFragment();
             Bundle args = new Bundle();
-            args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES, "Formulario");
+            args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES_TITLE, "Formulario");
+            args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES_SOURCE, "Excursion");
             args.putSerializable(FormExcursionesFragment.FORM_EXCURSION_KEY, excursion);
             fragment.setArguments(args);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
