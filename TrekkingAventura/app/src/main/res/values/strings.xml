@@ -45,4 +45,9 @@
     <string name="settings_notifications">Notificaciones mal tiempo</string>
     <string name="settings_notifications_excursion">Excursión</string>
     <string name="settings_notifications_excursion_sumary">Selecciona una excursión...</string>
+    <string name="widget_configuration">Configuración del widget</string>
+    <string name="widget_create_button">Añadir widget</string>
+    <string name="widget_default_text">EXAMPLE</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>
