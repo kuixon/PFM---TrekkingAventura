@@ -22,14 +22,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
@@ -38,7 +36,6 @@ import java.util.List;
 import java.util.Locale;
 
 import es.deusto.trekkingaventura.R;
-import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.utilities.ImageHelper;
 

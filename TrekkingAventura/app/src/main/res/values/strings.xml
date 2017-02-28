@@ -19,6 +19,7 @@
     <string name="edit_excursion">Editar Excursión</string>
     <string name="delete_excursion">Eliminar Excursión</string>
     <string name="share_excursion">Compartir Excursión</string>
+    <string name="go_back">Atrás</string>
     <string name="cancel_excursion">Cancelar</string>
     <string name="label_excursion_name">Nombre</string>
     <string name="label_excursion_opinion">Descripción/Opinión</string>

@@ -70,27 +70,16 @@ public class BuscarExcursionesFragment extends Fragment {
     }
 
     public void find(View v) {
-        // En este punto se realizaría la búsqueda.
+        // En este punto se realizaría la búsqueda y se le pasarían al fragment ResultadoBusqueda
+        // todas las excursiones resultantes.
 
-        // INICIO - Toast provisional
-        String level = "";
-        switch (rdgLevel.getCheckedRadioButtonId()) {
-            case R.id.b_level_low:
-                level = "Fácil";
-                break;
-            case R.id.b_level_medium:
-                level = "Medio";
-                break;
-            case R.id.b_level_high:
-                level = "Difícil";
-                break;
-        }
-        Toast.makeText(getContext(), "Buscar excursión con:"
-                + "\n - Nombre: '" + edtName.getText() + "'"
-                + "\n - Lugar: '" + edtLocation.getText() + "'"
-                + "\n - Distancia: '" + edtDistance.getText() + "'"
-                + "\n - Nivel: '" + level + "'",
-                Toast.LENGTH_LONG).show();
-        // FIN - Toast provisional
+        // INICIO - Búsqueda provisional donde el resulado serían las 4 excursiones de prueba
+        Fragment fragment = new ResultadoBusquedaFragment();
+        Bundle args = new Bundle();
+        args.putString(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA_TITLE, "Resultado de la búsqueda");
+        args.putSerializable(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA, arrExcursiones);
+        fragment.setArguments(args);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+        // INICIO - Búsqueda provisional donde el resulado serían las 4 excursiones de prueba
     }
 }
