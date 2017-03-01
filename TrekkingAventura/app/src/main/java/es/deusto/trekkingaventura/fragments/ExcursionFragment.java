@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
+
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.Weather;
@@ -33,7 +35,9 @@ import es.deusto.trekkingaventura.utilities.WeatherHttpClient;
 public class ExcursionFragment extends Fragment {
 
     public static final String EXCURSION_KEY = "excursion_key";
+    public static final String ARG_EXCURSIONES = "excursiones";
 
+    private ArrayList<Excursion> arrExcursiones;
     private Excursion excursion;
 
     private ImageView imgExc;
@@ -67,6 +71,7 @@ public class ExcursionFragment extends Fragment {
         // Obtenemos el nombre del elemento de la lista seleccionado.
         View rootView = inflater.inflate(R.layout.fragment_excursion, container, false);
 
+        arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_EXCURSIONES);
         excursion = (Excursion) getArguments().getSerializable(EXCURSION_KEY);
 
         // Le cambiamos el título a la actividad (al cambiar el título, estaremos llamando
@@ -170,17 +175,26 @@ public class ExcursionFragment extends Fragment {
             args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES_TITLE, "Formulario");
             args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES_SOURCE, "Excursion");
             args.putSerializable(FormExcursionesFragment.FORM_EXCURSION_KEY, excursion);
+            args.putSerializable(FormExcursionesFragment.FORM_EXCURSIONES, arrExcursiones);
             fragment.setArguments(args);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             return true;
         } else if (id == R.id.mnu_delete_exc) {
 
-            // Se elimina en este punto la excursión en cuestión
+            // Se elimina en este punto la excursión en cuestión. Habría que eliminarla de la BD.
 
             Toast.makeText(getContext(), "La excursión '" + excursion.getName() + "' ha sido eliminada.", Toast.LENGTH_SHORT).show();
 
+            for (Excursion e : arrExcursiones) {
+                if (e.getName().equals(excursion.getName())) {
+                    arrExcursiones.remove(e);
+                    break;
+                }
+            }
+
             Fragment fragment = new MisExcursionesFragment();
             Bundle args = new Bundle();
+            args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
             args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
             fragment.setArguments(args);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();

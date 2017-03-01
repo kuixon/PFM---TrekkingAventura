@@ -89,6 +89,7 @@ public class MisExcursionesFragment extends Fragment implements GoogleApiClient.
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Fragment fragment = new ExcursionFragment();
                 Bundle args = new Bundle();
+                args.putSerializable(ExcursionFragment.ARG_EXCURSIONES, arrExcursionesFiltered);
                 args.putSerializable(ExcursionFragment.EXCURSION_KEY, arrExcursionesFiltered.get(position));
                 fragment.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();

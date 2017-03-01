@@ -197,6 +197,7 @@ public class FormExcursionesFragment extends Fragment implements
                 Fragment fragment = new ExcursionFragment();
                 Bundle args = new Bundle();
                 args.putSerializable(ExcursionFragment.EXCURSION_KEY, excursion);
+                args.putSerializable(ExcursionFragment.ARG_EXCURSIONES, arrExcursiones);
                 fragment.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
