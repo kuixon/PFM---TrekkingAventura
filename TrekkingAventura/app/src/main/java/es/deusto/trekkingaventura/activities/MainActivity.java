@@ -163,14 +163,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Este listener redireccionará las peticiones que se realicen sobre cada uno de los
-    // elementos de la lista despegable al método selectItem; indicándole el elemento de
-    // la lista que fue clicado.
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sincronizamos el estado del drawer.
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Cambiamos las configuraciones del drawer si hubo modificaciones
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     private void selectItem(int position) {
@@ -223,20 +227,6 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.closeDrawer(drawerList);
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sincronizamos el estado del drawer.
-        drawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Cambiamos las configuraciones del drawer si hubo modificaciones
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
-
     private void createExcursionList() {
 
         // Creamos tres excursiones de prueba y las metemos al array de Excursiones.
@@ -250,5 +240,15 @@ public class MainActivity extends AppCompatActivity {
         arrExcursiones.add(exc2);
         arrExcursiones.add(exc3);
         arrExcursiones.add(exc4);
+    }
+
+    // Este listener redireccionará las peticiones que se realicen sobre cada uno de los
+    // elementos de la lista despegable al método selectItem; indicándole el elemento de
+    // la lista que fue clicado.
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectItem(position);
+        }
     }
 }

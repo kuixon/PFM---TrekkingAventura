@@ -120,8 +120,7 @@
         android:textAlignment="center"
         android:nestedScrollingEnabled="false"
         android:background="@color/colorPrimary"
-        android:textColor="#ffffff"
-        android:onClick="geolocate" />
+        android:textColor="#ffffff" />
 
     <LinearLayout
         android:orientation="vertical"

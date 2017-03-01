@@ -1,9 +1,11 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Geocoder;
@@ -11,7 +13,9 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +28,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -48,6 +53,7 @@ public class FormExcursionesFragment extends Fragment implements
 
     // Este atributo nos servirá para saber la posición del item seleccionado de la lista
     // desplegable.
+    public static final int REQUEST_LOCATION_ENABLE = 1;
     public static final String ARG_FORM_EXCURSIONES_TITLE = "form_excursiones_title";
     public static final String ARG_FORM_EXCURSIONES_SOURCE = "form_excursiones_source";
     public static final String FORM_EXCURSION_KEY = "form_excursion_key";
@@ -109,7 +115,24 @@ public class FormExcursionesFragment extends Fragment implements
         btnGeolocate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                geolocate(v);
+                // Comprobamos los permisos de Geolocalización
+                if (ContextCompat.checkSelfPermission(getContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                            Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        Log.i("INFO_GEOLOC", "Es necesaria una explicación de por qué se solicitan los permisos");
+                        Toast.makeText(getActivity(), "La aplicación utiliza tu localización para ayudarte a" +
+                                " rellenar los campos 'Lugar', 'Latitud' y 'Longitud' del formulario.", Toast.LENGTH_LONG).show();
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_ENABLE);
+                    } else {
+                        Log.i("INFO_GEOLOC", "Se solicitan los permisos");
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_ENABLE);
+                    }
+                } else {
+                    Log.i("INFO_GEOLOC", "El usuario tiene permisos");
+                    geolocate();
+                }
             }
         });
 
@@ -137,26 +160,6 @@ public class FormExcursionesFragment extends Fragment implements
         }
 
         return rootView;
-    }
-
-    private void initializeFields(Excursion excursion) {
-        edtName.setText(excursion.getName());
-        edtDescription.setText(excursion.getOpinion());
-        edtLocation.setText(excursion.getLocation());
-        edtDistance.setText(Double.toString(excursion.getTravelDistance()));
-        switch (excursion.getLevel()) {
-            case "Facil":
-                rdgLevel.check(R.id.button_level_low);
-                break;
-            case "Medio":
-                rdgLevel.check(R.id.button_level_medium);
-                break;
-            case "Dificil":
-                rdgLevel.check(R.id.button_level_high);
-                break;
-        }
-        edtLatitude.setText(Float.toString(excursion.getLatitude()));
-        edtLongitude.setText(Float.toString(excursion.getLongitude()));
     }
 
     @Override
@@ -213,64 +216,6 @@ public class FormExcursionesFragment extends Fragment implements
         }
     }
 
-    public void geolocate(View v) {
-        Location loc = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
-
-        List<android.location.Address> addresses = null;
-        try {
-            addresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-        } catch (IOException e) {
-            Log.i("Error", "No se ha podido obtener la dirección.");
-            e.printStackTrace();
-        }
-
-        Log.i("Latitude", Double.toString(loc.getLatitude()));
-        Log.i("Longitude", Double.toString(loc.getLongitude()));
-        Log.i("City", addresses.get(0).getLocality());
-        edtLatitude.setText(Double.toString(loc.getLatitude()));
-        edtLongitude.setText(Double.toString(loc.getLongitude()));
-        edtLocation.setText(addresses.get(0).getLocality());
-    }
-
-    private void addImage(View v) {
-
-        final String[] menu_tags = getResources().getStringArray(R.array.Add_Image_Menu);
-        final CharSequence[] options = {menu_tags[0], menu_tags[1], menu_tags[2]};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-        builder.setTitle(R.string.add_menu_title);
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-
-                if (options[item].equals(options[0])) {
-                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                        File image = null;
-                        try {
-                            image = ImageHelper.createImageFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        if (image != null) {
-                            imageUri = Uri.fromFile(image);
-                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                            startActivityForResult(intent, IMG_FROM_CAMERA);
-                        }
-                    }
-                } else if (options[item].equals(options[1])) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, IMG_FROM_GALLERY);
-                } else if (options[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == IMG_FROM_CAMERA) {
@@ -314,6 +259,117 @@ public class FormExcursionesFragment extends Fragment implements
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i("Location client", "Connected");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i("Location client", "Connection suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        showMessageDialog("Internet connection is not available");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.i("INFO_GEOLOC", "Se reciben las solicitudes de permisos.");
+        switch (requestCode) {
+            case REQUEST_LOCATION_ENABLE: {
+                Log.i("INFO_GEOLOC", "Se entra al case de REQUEST_LOCATION_ENABLE");
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("INFO_GEOLOC", "Se conceden los permisos");
+                    geolocate();
+                } else {
+                    Log.i("INFO_GEOLOC", "Se deniegan los permisos");
+                    Toast.makeText(getActivity(), "La app no puede utilizar esta funcionalidad porque no se han concedido" +
+                            " permisos de localización.", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+    }
+
+    private void initializeFields(Excursion excursion) {
+        edtName.setText(excursion.getName());
+        edtDescription.setText(excursion.getOpinion());
+        edtLocation.setText(excursion.getLocation());
+        edtDistance.setText(Double.toString(excursion.getTravelDistance()));
+        switch (excursion.getLevel()) {
+            case "Facil":
+                rdgLevel.check(R.id.button_level_low);
+                break;
+            case "Medio":
+                rdgLevel.check(R.id.button_level_medium);
+                break;
+            case "Dificil":
+                rdgLevel.check(R.id.button_level_high);
+                break;
+        }
+        edtLatitude.setText(Float.toString(excursion.getLatitude()));
+        edtLongitude.setText(Float.toString(excursion.getLongitude()));
+    }
+
+    private void geolocate() {
+        Log.i("INFO_GEOLOC", "Se entra a geolocalizar.");
+        Location loc = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+
+        List<android.location.Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+        } catch (IOException e) {
+            Log.i("Error", "No se ha podido obtener la dirección.");
+            e.printStackTrace();
+        }
+
+        edtLatitude.setText(Double.toString(loc.getLatitude()));
+        edtLongitude.setText(Double.toString(loc.getLongitude()));
+        edtLocation.setText(addresses.get(0).getLocality());
+    }
+
+    private void addImage(View v) {
+
+        final String[] menu_tags = getResources().getStringArray(R.array.Add_Image_Menu);
+        final CharSequence[] options = {menu_tags[0], menu_tags[1], menu_tags[2]};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+        builder.setTitle(R.string.add_menu_title);
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                if (options[item].equals(options[0])) {
+                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                        File image = null;
+                        try {
+                            image = ImageHelper.createImageFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (image != null) {
+                            imageUri = Uri.fromFile(image);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                            startActivityForResult(intent, IMG_FROM_CAMERA);
+                        }
+                    }
+                } else if (options[item].equals(options[1])) {
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, IMG_FROM_GALLERY);
+                } else if (options[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
     private boolean connectToGooglePlayServices(){
         if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext()) != ConnectionResult.SUCCESS){
             return false;
@@ -348,20 +404,5 @@ public class FormExcursionesFragment extends Fragment implements
         });
         AlertDialog alert = builder.create();
         alert.show();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i("Location client", "Connected");
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i("Location client", "Connection suspended");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        showMessageDialog("Internet connection is not available");
     }
 }
