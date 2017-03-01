@@ -32,6 +32,7 @@ import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,11 +51,13 @@ public class FormExcursionesFragment extends Fragment implements
     public static final String ARG_FORM_EXCURSIONES_TITLE = "form_excursiones_title";
     public static final String ARG_FORM_EXCURSIONES_SOURCE = "form_excursiones_source";
     public static final String FORM_EXCURSION_KEY = "form_excursion_key";
+    public static final String FORM_EXCURSIONES = "form_excursiones";
     public static final int IMG_FROM_CAMERA = 1;
     public static final int IMG_FROM_GALLERY = 2;
 
     private GoogleApiClient mGoogleApiClient;
 
+    private ArrayList<Excursion> arrExcursiones;
     private Excursion excursion;
 
     private EditText edtName;
@@ -89,6 +92,8 @@ public class FormExcursionesFragment extends Fragment implements
 
         // Ponemos esta opción a true para poder inflar el menu en la Toolbar.
         setHasOptionsMenu(true);
+
+        arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(FORM_EXCURSIONES);
 
         edtName = (EditText) rootView.findViewById(R.id.edtName);
         edtDescription = (EditText) rootView.findViewById(R.id.edtDescription);
@@ -184,6 +189,7 @@ public class FormExcursionesFragment extends Fragment implements
                     getArguments().getString(ARG_FORM_EXCURSIONES_SOURCE).equals("Mis Excursiones")) {
                 Fragment fragment = new MisExcursionesFragment();
                 Bundle args = new Bundle();
+                args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
                 args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
                 fragment.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
