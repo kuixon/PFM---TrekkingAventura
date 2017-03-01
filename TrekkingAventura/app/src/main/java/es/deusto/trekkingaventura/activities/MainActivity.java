@@ -1,6 +1,7 @@
 package es.deusto.trekkingaventura.activities;
 
 import android.content.res.Configuration;
+import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     /*
      DECLARACIONES
      */
+    public static String USER_ID;
+
     private Toolbar toolbar;
 
     private boolean menuOptionEnabled = true;
@@ -55,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Obtenemos el ID del Usuario
+        USER_ID = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
 
         // Inicializamos la lista de excursiones
         createExcursionList();
