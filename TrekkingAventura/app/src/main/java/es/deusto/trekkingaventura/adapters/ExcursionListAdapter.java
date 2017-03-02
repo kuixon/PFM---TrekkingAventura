@@ -1,6 +1,8 @@
 package es.deusto.trekkingaventura.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.List;
 
 import es.deusto.trekkingaventura.R;
@@ -39,19 +42,11 @@ public class ExcursionListAdapter extends ArrayAdapter<Excursion> {
             TextView txtLocation = (TextView) v.findViewById(R.id.excursionLocation);
             TextView txtDistance = (TextView) v.findViewById(R.id.excursionDistance);
 
-            switch (excursion.getImgPath()) {
-                case "Cares":
-                    imageExcursion.setImageResource(R.drawable.rutadelcares);
-                    break;
-                case "Relux":
-                    imageExcursion.setImageResource(R.drawable.ventanarelux);
-                    break;
-                case "Caballo":
-                    imageExcursion.setImageResource(R.drawable.farodelcaballo);
-                    break;
-                case "Gorbea":
-                    imageExcursion.setImageResource(R.drawable.gorbea);
-                    break;
+            if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty() || ! new File(excursion.getImgPath()).exists()) {
+                imageExcursion.setImageResource(R.drawable.imgnotavailable);
+            } else {
+                Bitmap thumbnail = (BitmapFactory.decodeFile(excursion.getImgPath()));
+                imageExcursion.setImageBitmap(thumbnail);
             }
 
             txtName.setText(excursion.getName());

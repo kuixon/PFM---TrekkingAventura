@@ -1,6 +1,8 @@
 package es.deusto.trekkingaventura.fragments;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
@@ -57,7 +60,7 @@ public class ExcursionFragment extends Fragment {
     private TextView windSpeed;
     private TextView windDeg;
     private TextView hum;
-    private ImageView imgView;
+    private ImageView imgWeather;
     private LinearLayout panelTiempo;
     private LinearLayout panelTiempoNoDisponible;
 
@@ -98,23 +101,15 @@ public class ExcursionFragment extends Fragment {
         press = (TextView) rootView.findViewById(R.id.press);
         windSpeed = (TextView) rootView.findViewById(R.id.windSpeed);
         windDeg = (TextView) rootView.findViewById(R.id.windDeg);
-        imgView = (ImageView) rootView.findViewById(R.id.condIcon);
+        imgWeather = (ImageView) rootView.findViewById(R.id.condIcon);
         panelTiempo = (LinearLayout) rootView.findViewById(R.id.panelTiempo);
         panelTiempoNoDisponible = (LinearLayout) rootView.findViewById(R.id.panelTiempoNoDisponible);
 
-        switch (excursion.getImgPath()) {
-            case "Cares":
-                imgExc.setImageResource(R.drawable.rutadelcares);
-                break;
-            case "Relux":
-                imgExc.setImageResource(R.drawable.ventanarelux);
-                break;
-            case "Caballo":
-                imgExc.setImageResource(R.drawable.farodelcaballo);
-                break;
-            case "Gorbea":
-                imgExc.setImageResource(R.drawable.gorbea);
-                break;
+        if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty() || ! new File(excursion.getImgPath()).exists()) {
+            imgExc.setImageResource(R.drawable.imgnotavailable);
+        } else {
+            Bitmap thumbnail = (BitmapFactory.decodeFile(excursion.getImgPath()));
+            imgExc.setImageBitmap(thumbnail);
         }
 
         txtName.setText(excursion.getName());
@@ -232,65 +227,65 @@ public class ExcursionFragment extends Fragment {
                 if (weather.currentCondition.getIcon() != null) {
                     switch (weather.currentCondition.getIcon()) {
                         case "01d":
-                            imgView.setImageResource(R.drawable.img01d);
+                            imgWeather.setImageResource(R.drawable.img01d);
                             break;
                         case "01n":
-                            imgView.setImageResource(R.drawable.img01n);
+                            imgWeather.setImageResource(R.drawable.img01n);
                             break;
                         case "02d":
-                            imgView.setImageResource(R.drawable.img02d);
+                            imgWeather.setImageResource(R.drawable.img02d);
                             break;
                         case "02n":
-                            imgView.setImageResource(R.drawable.img02n);
+                            imgWeather.setImageResource(R.drawable.img02n);
                             break;
                         case "03d":
-                            imgView.setImageResource(R.drawable.img03d);
+                            imgWeather.setImageResource(R.drawable.img03d);
                             break;
                         case "03n":
-                            imgView.setImageResource(R.drawable.img03n);
+                            imgWeather.setImageResource(R.drawable.img03n);
                             break;
                         case "04d":
-                            imgView.setImageResource(R.drawable.img04d);
+                            imgWeather.setImageResource(R.drawable.img04d);
                             break;
                         case "04n":
-                            imgView.setImageResource(R.drawable.img04n);
+                            imgWeather.setImageResource(R.drawable.img04n);
                             break;
                         case "09d":
-                            imgView.setImageResource(R.drawable.img09d);
+                            imgWeather.setImageResource(R.drawable.img09d);
                             break;
                         case "09n":
-                            imgView.setImageResource(R.drawable.img09n);
+                            imgWeather.setImageResource(R.drawable.img09n);
                             break;
                         case "10d":
-                            imgView.setImageResource(R.drawable.img10d);
+                            imgWeather.setImageResource(R.drawable.img10d);
                             break;
                         case "10n":
-                            imgView.setImageResource(R.drawable.img10n);
+                            imgWeather.setImageResource(R.drawable.img10n);
                             break;
                         case "11d":
-                            imgView.setImageResource(R.drawable.img11d);
+                            imgWeather.setImageResource(R.drawable.img11d);
                             break;
                         case "11n":
-                            imgView.setImageResource(R.drawable.img11n);
+                            imgWeather.setImageResource(R.drawable.img11n);
                             break;
                         case "13d":
-                            imgView.setImageResource(R.drawable.img13d);
+                            imgWeather.setImageResource(R.drawable.img13d);
                             break;
                         case "13n":
-                            imgView.setImageResource(R.drawable.img13n);
+                            imgWeather.setImageResource(R.drawable.img13n);
                             break;
                         case "50d":
-                            imgView.setImageResource(R.drawable.img50d);
+                            imgWeather.setImageResource(R.drawable.img50d);
                             break;
                         case "50n":
-                            imgView.setImageResource(R.drawable.img50n);
+                            imgWeather.setImageResource(R.drawable.img50n);
                             break;
                         default:
-                            imgView.setImageResource(R.drawable.imgnotavailable);
+                            imgWeather.setImageResource(R.drawable.imgnotavailable);
                             break;
                     }
                 } else {
-                    imgView.setImageResource(R.drawable.imgnotavailable);
+                    imgWeather.setImageResource(R.drawable.imgnotavailable);
                 }
 
                 cityText.setText(weather.location.getCity() + "," + weather.location.getCountry());

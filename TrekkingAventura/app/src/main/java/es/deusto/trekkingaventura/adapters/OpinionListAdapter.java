@@ -1,6 +1,8 @@
 package es.deusto.trekkingaventura.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.List;
 
 import es.deusto.trekkingaventura.R;
@@ -40,20 +43,11 @@ public class OpinionListAdapter extends ArrayAdapter<Excursion> {
             ImageView imageExcursion = (ImageView) v.findViewById(R.id.excursionImage);
             TextView txtOpinion = (TextView) v.findViewById(R.id.excursionOpinion);
 
-            // Método temporal para cargar las imágenes de prueba.
-            switch (opinion.getImgPath()) {
-                case "Cares":
-                    imageExcursion.setImageResource(R.drawable.rutadelcares);
-                    break;
-                case "Relux":
-                    imageExcursion.setImageResource(R.drawable.ventanarelux);
-                    break;
-                case "Caballo":
-                    imageExcursion.setImageResource(R.drawable.farodelcaballo);
-                    break;
-                case "Gorbea":
-                    imageExcursion.setImageResource(R.drawable.gorbea);
-                    break;
+            if(opinion.getImgPath() == null || opinion.getImgPath().isEmpty() || ! new File(opinion.getImgPath()).exists()) {
+                imageExcursion.setImageResource(R.drawable.imgnotavailable);
+            } else {
+                Bitmap thumbnail = (BitmapFactory.decodeFile(opinion.getImgPath()));
+                imageExcursion.setImageBitmap(thumbnail);
             }
 
             txtOpinion.setText(opinion.getOpinion());

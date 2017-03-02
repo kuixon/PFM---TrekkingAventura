@@ -8,13 +8,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -30,7 +30,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -91,6 +90,8 @@ public class FormExcursionesFragment extends Fragment implements
     private ImageButton deleteSelectedImg;
 
     private Uri imageUri;
+
+    private boolean editar;
 
     public FormExcursionesFragment() {
 
@@ -161,6 +162,7 @@ public class FormExcursionesFragment extends Fragment implements
         deleteSelectedImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                excursion.setImgPath(null);
                 txtImage.setText("");
                 txtImage.setVisibility(View.GONE);
                 deleteSelectedImg.setVisibility(View.GONE);
@@ -169,8 +171,10 @@ public class FormExcursionesFragment extends Fragment implements
 
         excursion = (Excursion) getArguments().getSerializable(FORM_EXCURSION_KEY);
         if (excursion != null) {
+            editar = true;
             initializeFields(excursion);
         } else {
+            editar = false;
             excursion = new Excursion();
         }
 
@@ -222,11 +226,57 @@ public class FormExcursionesFragment extends Fragment implements
 
             return true;
         } else if (id == R.id.mnu_create_exc) {
-            // En este punto, se tendría que crear la excursión y almacenarla en la BDD del servidor. Por el momento,
+            // En este punto, se tendría que crear/editar la excursión y almacenarla en la BDD del servidor. Por el momento,
             // añadimos/editamos la excursión y la cambiamos en memoria.
             if (validateFields()) {
                 // Todo está bien validado
-                showMessageDialog("Todo esta correcto");
+                excursion.setName(edtName.getText().toString());
+                excursion.setOpinion(edtDescription.getText().toString());
+                excursion.setLocation(edtLocation.getText().toString());
+                excursion.setTravelDistance(Double.parseDouble(edtDistance.getText().toString().trim()));
+
+                switch (rdgLevel.getCheckedRadioButtonId()) {
+                    case R.id.button_level_low:
+                        excursion.setLevel("Facil");
+                        break;
+                    case R.id.button_level_medium:
+                        excursion.setLevel("Medio");
+                        break;
+                    case R.id.button_level_high:
+                        excursion.setLevel("Dificil");
+                        break;
+                }
+
+                excursion.setLatitude(Float.parseFloat(edtLatitude.getText().toString().trim()));
+                excursion.setLongitude(Float.parseFloat(edtLongitude.getText().toString().trim()));
+
+                if (editar) {
+                    // Estamos editando un excursión existente
+                    for (Excursion e : arrExcursiones) {
+                        if (e.getId() == excursion.getId()) {
+                            e.setName(excursion.getName());
+                            e.setOpinion(excursion.getOpinion());
+                            e.setLocation(excursion.getLocation());
+                            e.setTravelDistance(excursion.getTravelDistance());
+                            e.setLevel(excursion.getLevel());
+                            e.setLatitude(excursion.getLatitude());
+                            e.setLongitude(excursion.getLongitude());
+                            e.setImgPath(excursion.getImgPath());
+                            break;
+                        }
+                    }
+                } else {
+                    // Estamos creando una nueva excursión
+                    arrExcursiones.add(excursion);
+                }
+
+                Fragment fragment = new MisExcursionesFragment();
+                Bundle args = new Bundle();
+                args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
+                args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
+                fragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+
                 return true;
             }
         }
@@ -388,6 +438,12 @@ public class FormExcursionesFragment extends Fragment implements
         }
         edtLatitude.setText(Float.toString(excursion.getLatitude()));
         edtLongitude.setText(Float.toString(excursion.getLongitude()));
+
+        if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty() && new File(excursion.getImgPath()).exists()) {
+            txtImage.setText(excursion.getImgPath());
+            txtImage.setVisibility(View.VISIBLE);
+            deleteSelectedImg.setVisibility(View.VISIBLE);
+        }
     }
 
     private boolean validateFields() {
