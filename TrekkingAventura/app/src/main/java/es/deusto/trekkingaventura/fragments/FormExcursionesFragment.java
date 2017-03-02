@@ -13,6 +13,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -66,6 +68,14 @@ public class FormExcursionesFragment extends Fragment implements
     private ArrayList<Excursion> arrExcursiones;
     private Excursion excursion;
 
+    private TextInputLayout inputLayoutName;
+    private TextInputLayout inputLayoutDescription;
+    private TextInputLayout inputLayoutLocation;
+    private TextInputLayout inputLayoutDistance;
+    private TextInputLayout inputLayoutLevel;
+    private TextInputLayout inputLayoutLatitude;
+    private TextInputLayout inputLayoutLongitude;
+
     private EditText edtName;
     private EditText edtDescription;
     private EditText edtLocation;
@@ -101,11 +111,22 @@ public class FormExcursionesFragment extends Fragment implements
 
         arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(FORM_EXCURSIONES);
 
+        inputLayoutName = (TextInputLayout) rootView.findViewById(R.id.input_layout_name);
+        inputLayoutDescription = (TextInputLayout) rootView.findViewById(R.id.input_layout_description);
+        inputLayoutLocation = (TextInputLayout) rootView.findViewById(R.id.input_layout_location);
+        inputLayoutDistance = (TextInputLayout) rootView.findViewById(R.id.input_layout_distance);
+        inputLayoutLevel = (TextInputLayout) rootView.findViewById(R.id.input_layout_level);
+        inputLayoutLatitude = (TextInputLayout) rootView.findViewById(R.id.input_layout_latitude);
+        inputLayoutLongitude = (TextInputLayout) rootView.findViewById(R.id.input_layout_longitude);
+
         edtName = (EditText) rootView.findViewById(R.id.edtName);
         edtDescription = (EditText) rootView.findViewById(R.id.edtDescription);
         edtLocation = (EditText) rootView.findViewById(R.id.edtLocation);
         edtDistance = (EditText) rootView.findViewById(R.id.edtDistance);
+
         rdgLevel = (RadioGroup) rootView.findViewById(R.id.radioGroup);
+        rdgLevel.check(R.id.button_level_low);
+
         edtLatitude = (EditText) rootView.findViewById(R.id.edtLatitude);
         edtLongitude = (EditText) rootView.findViewById(R.id.edtLongitude);
 
@@ -207,13 +228,16 @@ public class FormExcursionesFragment extends Fragment implements
 
             return true;
         } else if (id == R.id.mnu_create_exc) {
-
-            // En este punto, se tendría que crear la excursión y almacenarla en la BDD del servidor.
-
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
+            // En este punto, se tendría que crear la excursión y almacenarla en la BDD del servidor. Por el momento,
+            // añadimos/editamos la excursión y la cambiamos en memoria.
+            if (validateFields()) {
+                // Todo está bien validado
+                showMessageDialog("Todo esta correcto");
+                return true;
+            }
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -234,6 +258,7 @@ public class FormExcursionesFragment extends Fragment implements
                 txtImage.setText(imageUri.getPath());
                 txtImage.setVisibility(View.VISIBLE);
                 deleteSelectedImg.setVisibility(View.VISIBLE);
+                //excursion.setImgPath(imageUri.getPath());
             }
         } else if (requestCode == IMG_FROM_GALLERY) {
             if (resultCode == RESULT_OK) {
@@ -248,6 +273,7 @@ public class FormExcursionesFragment extends Fragment implements
                     txtImage.setText(picturePath);
                     txtImage.setVisibility(View.VISIBLE);
                     deleteSelectedImg.setVisibility(View.VISIBLE);
+                    //excursion.setImgPath(picturePath);
                 }
             } else {
                 Log.i("Error:", "No se ha seleccionado ninguna imagen.");
@@ -312,6 +338,115 @@ public class FormExcursionesFragment extends Fragment implements
         }
         edtLatitude.setText(Float.toString(excursion.getLatitude()));
         edtLongitude.setText(Float.toString(excursion.getLongitude()));
+    }
+
+    private boolean validateFields() {
+        if (!validateName()) {
+            return false;
+        }
+
+        if (!validateDescription()) {
+            return false;
+        }
+
+        if (!validateLocation()) {
+            return false;
+        }
+
+        if (!validateDistance()) {
+            return false;
+        }
+
+        if (!validateLatitude()) {
+            return false;
+        }
+
+        if (!validateLongitude()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateName() {
+        if (edtName.getText().toString().trim().isEmpty()) {
+            inputLayoutName.setError(getString(R.string.error_required_name));
+            requestFocus(edtName);
+            return false;
+        } else {
+            inputLayoutName.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+    private boolean validateDescription() {
+        if (edtDescription.getText().toString().trim().isEmpty()) {
+            inputLayoutDescription.setError(getString(R.string.error_required_description));
+            requestFocus(edtDescription);
+            return false;
+        } else {
+            inputLayoutDescription.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+    private boolean validateLocation() {
+        if (edtLocation.getText().toString().trim().isEmpty()) {
+            inputLayoutLocation.setError(getString(R.string.error_required_location));
+            requestFocus(edtLocation);
+            return false;
+        } else {
+            inputLayoutLocation.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+    private boolean validateDistance() {
+        if (edtDistance.getText().toString().trim().isEmpty()) {
+            inputLayoutDistance.setError(getString(R.string.error_required_distance));
+            requestFocus(edtDistance);
+            return false;
+        } else {
+            final double distance = Double.parseDouble(edtDistance.getText().toString().trim());
+
+            if (distance == 0) {
+                inputLayoutDistance.setError(getString(R.string.error_distance_value));
+                requestFocus(edtDistance);
+                return false;
+            } else {
+                inputLayoutDistance.setErrorEnabled(false);
+            }
+        }
+
+        return true;
+    }
+
+    private boolean validateLatitude() {
+        if (edtLatitude.getText().toString().trim().isEmpty()) {
+            inputLayoutLatitude.setError(getString(R.string.error_required_latitude));
+            requestFocus(edtLatitude);
+            return false;
+        } else {
+            inputLayoutLatitude.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+    private boolean validateLongitude() {
+        if (edtLongitude.getText().toString().trim().isEmpty()) {
+            inputLayoutLongitude.setError(getString(R.string.error_required_longitude));
+            requestFocus(edtLongitude);
+            return false;
+        } else {
+            inputLayoutLongitude.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+    private void requestFocus(View view) {
+        if (view.requestFocus()) {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
     }
 
     private void geolocate() {

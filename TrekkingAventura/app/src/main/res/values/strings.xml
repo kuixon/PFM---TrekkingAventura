@@ -31,6 +31,15 @@
     <string name="label_excursion_location">Lugar</string>
     <string name="label_excursion_latitude">Latitud</string>
     <string name="label_excursion_longitude">Longitud</string>
+    <string name="error_message">Hay errores en el formulario</string>
+    <string name="error_required_name">El nombre es obligatorio</string>
+    <string name="error_required_description">La descripción es obligatoria</string>
+    <string name="error_required_location">El lugar es obligatorio</string>
+    <string name="error_required_distance">La distancia es obligatoria</string>
+    <string name="error_distance_value">La distancia no puede ser 0</string>
+    <string name="error_required_level">Es obligatorio seleccionar un nivel</string>
+    <string name="error_required_latitude">La latitud es obligatoria</string>
+    <string name="error_required_longitude">La longitud es obligatoria</string>
     <string name="button_geolocate">Geolocalizar</string>
     <string name="button_add_image">Añadir imagen</string>
     <string name="button_find">Buscar</string>

@@ -29,5 +29,8 @@ dependencies {
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.google.android.gms:play-services:9.8.0'
     // FIN - Dependencias Google Play Services
+    // INICIO - Dependencias Design para errores formulario
+    compile 'com.android.support:design:23.3.0'
+    // FIN - Dependencias Design para errores formulario
     testCompile 'junit:junit:4.12'
 }

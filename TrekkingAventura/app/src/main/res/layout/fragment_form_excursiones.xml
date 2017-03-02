@@ -3,22 +3,38 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/edtName"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/label_excursion_name"
-        android:ems="10"
-        android:layout_marginBottom="5sp" />
+        android:layout_marginBottom="5dp">
 
-    <EditText
-        android:id="@+id/edtDescription"
+        <EditText
+            android:id="@+id/edtName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/label_excursion_name"
+            android:ems="10"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:ems="10"
-        android:hint="@string/label_excursion_opinion"
-        android:layout_marginBottom="5sp" />
+        android:layout_marginBottom="5dp">
+
+        <EditText
+            android:id="@+id/edtDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:hint="@string/label_excursion_opinion"/>
+
+    </android.support.design.widget.TextInputLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,22 +43,36 @@
         android:weightSum="1"
         android:layout_marginBottom="5sp">
 
-        <EditText
-            android:id="@+id/edtLocation"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/label_excursion_location"
-            android:ems="10"
-            android:layout_weight="0.5"/>
+            android:layout_weight="0.5">
 
-        <EditText
-            android:id="@+id/edtDistance"
+            <EditText
+                android:id="@+id/edtLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/label_excursion_location"
+                android:ems="10"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_distance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:hint="@string/label_excursion_distance"
-            android:layout_weight="0.1" />
+            android:layout_weight="0.1">
+
+            <EditText
+                android:id="@+id/edtDistance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:ems="10"
+                android:hint="@string/label_excursion_distance"/>
+
+        </android.support.design.widget.TextInputLayout>
 
     </LinearLayout>
 
@@ -55,36 +85,43 @@
         android:textAlignment="center"
         android:layout_marginBottom="5sp" />
 
-    <RadioGroup
-        android:id="@+id/radioGroup"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_level"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1.2"
-        android:layout_marginBottom="5sp">
+        android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/button_level_low"
-            android:text="@string/label_excursion_level_low"
+        <RadioGroup
+            android:id="@+id/radioGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.4"/>
+            android:orientation="horizontal"
+            android:weightSum="1.2"
+            android:layout_marginBottom="5sp">
 
-        <RadioButton
-            android:id="@+id/button_level_medium"
-            android:text="@string/label_excursion_level_medium"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.4"/>
+            <RadioButton
+                android:id="@+id/button_level_low"
+                android:text="@string/label_excursion_level_low"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"/>
 
-        <RadioButton
-            android:id="@+id/button_level_high"
-            android:text="@string/label_excursion_level_high"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.4"/>
+            <RadioButton
+                android:id="@+id/button_level_medium"
+                android:text="@string/label_excursion_level_medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"/>
 
-    </RadioGroup>
+            <RadioButton
+                android:id="@+id/button_level_high"
+                android:text="@string/label_excursion_level_high"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"/>
+
+        </RadioGroup>
+
+    </android.support.design.widget.TextInputLayout>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -92,23 +129,37 @@
         android:layout_height="wrap_content"
         android:weightSum="1">
 
-        <EditText
-            android:id="@+id/edtLatitude"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_latitude"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/label_excursion_latitude"
-            android:layout_weight="0.5"
-            android:inputType="numberSigned|numberDecimal" />
+            android:layout_weight="0.5">
 
-        <EditText
-            android:id="@+id/edtLongitude"
+            <EditText
+                android:id="@+id/edtLatitude"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/label_excursion_latitude"
+                android:inputType="numberSigned|numberDecimal" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_longitude"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/label_excursion_longitude"
-            android:layout_weight="0.5"
-            android:inputType="numberSigned|numberDecimal" />
+            android:layout_weight="0.5">
+
+            <EditText
+                android:id="@+id/edtLongitude"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/label_excursion_longitude"
+                android:inputType="numberSigned|numberDecimal" />
+
+        </android.support.design.widget.TextInputLayout>
 
     </LinearLayout>
 
