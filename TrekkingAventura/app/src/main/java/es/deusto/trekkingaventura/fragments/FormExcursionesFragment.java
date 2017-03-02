@@ -56,6 +56,8 @@ public class FormExcursionesFragment extends Fragment implements
     // Este atributo nos servirá para saber la posición del item seleccionado de la lista
     // desplegable.
     public static final int REQUEST_LOCATION_ENABLE = 1;
+    public static final int REQUEST_CAMERA_ENABLE = 2;
+    public static final int REQUEST_GALERY_ENABLE = 3;
     public static final String ARG_FORM_EXCURSIONES_TITLE = "form_excursiones_title";
     public static final String ARG_FORM_EXCURSIONES_SOURCE = "form_excursiones_source";
     public static final String FORM_EXCURSION_KEY = "form_excursion_key";
@@ -72,7 +74,6 @@ public class FormExcursionesFragment extends Fragment implements
     private TextInputLayout inputLayoutDescription;
     private TextInputLayout inputLayoutLocation;
     private TextInputLayout inputLayoutDistance;
-    private TextInputLayout inputLayoutLevel;
     private TextInputLayout inputLayoutLatitude;
     private TextInputLayout inputLayoutLongitude;
 
@@ -115,7 +116,6 @@ public class FormExcursionesFragment extends Fragment implements
         inputLayoutDescription = (TextInputLayout) rootView.findViewById(R.id.input_layout_description);
         inputLayoutLocation = (TextInputLayout) rootView.findViewById(R.id.input_layout_location);
         inputLayoutDistance = (TextInputLayout) rootView.findViewById(R.id.input_layout_distance);
-        inputLayoutLevel = (TextInputLayout) rootView.findViewById(R.id.input_layout_level);
         inputLayoutLatitude = (TextInputLayout) rootView.findViewById(R.id.input_layout_latitude);
         inputLayoutLongitude = (TextInputLayout) rootView.findViewById(R.id.input_layout_longitude);
 
@@ -140,16 +140,8 @@ public class FormExcursionesFragment extends Fragment implements
                 if (ContextCompat.checkSelfPermission(getContext(),
                         Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                            Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        Log.i("INFO_GEOLOC", "Es necesaria una explicación de por qué se solicitan los permisos");
-                        Toast.makeText(getActivity(), "La aplicación utiliza tu localización para ayudarte a" +
-                                " rellenar los campos 'Lugar', 'Latitud' y 'Longitud' del formulario.", Toast.LENGTH_LONG).show();
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_ENABLE);
-                    } else {
-                        Log.i("INFO_GEOLOC", "Se solicitan los permisos");
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_ENABLE);
-                    }
+                    Log.i("INFO_GEOLOC", "Se solicitan los permisos");
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_ENABLE);
                 } else {
                     Log.i("INFO_GEOLOC", "El usuario tiene permisos");
                     geolocate();
@@ -178,6 +170,8 @@ public class FormExcursionesFragment extends Fragment implements
         excursion = (Excursion) getArguments().getSerializable(FORM_EXCURSION_KEY);
         if (excursion != null) {
             initializeFields(excursion);
+        } else {
+            excursion = new Excursion();
         }
 
         return rootView;
@@ -258,7 +252,7 @@ public class FormExcursionesFragment extends Fragment implements
                 txtImage.setText(imageUri.getPath());
                 txtImage.setVisibility(View.VISIBLE);
                 deleteSelectedImg.setVisibility(View.VISIBLE);
-                //excursion.setImgPath(imageUri.getPath());
+                excursion.setImgPath(imageUri.getPath());
             }
         } else if (requestCode == IMG_FROM_GALLERY) {
             if (resultCode == RESULT_OK) {
@@ -269,11 +263,10 @@ public class FormExcursionesFragment extends Fragment implements
                     int columnIndex = c.getColumnIndex(filePath[0]);
                     String picturePath = c.getString(columnIndex);
                     c.close();
-                    Log.i("Ruta foto", picturePath);
                     txtImage.setText(picturePath);
                     txtImage.setVisibility(View.VISIBLE);
                     deleteSelectedImg.setVisibility(View.VISIBLE);
-                    //excursion.setImgPath(picturePath);
+                    excursion.setImgPath(picturePath);
                 }
             } else {
                 Log.i("Error:", "No se ha seleccionado ninguna imagen.");
@@ -312,8 +305,65 @@ public class FormExcursionesFragment extends Fragment implements
                     geolocate();
                 } else {
                     Log.i("INFO_GEOLOC", "Se deniegan los permisos");
-                    Toast.makeText(getActivity(), "La app no puede utilizar esta funcionalidad porque no se han concedido" +
-                            " permisos de localización.", Toast.LENGTH_LONG).show();
+                    showMessageDialog("ERROR: La app no puede utilizar esta funcionalidad porque no se han concedido" +
+                            " permisos de localización.\n\nINFO: La aplicación utiliza tu localización para ayudarte a" +
+                    " rellenar los campos 'Lugar', 'Latitud' y 'Longitud' del formulario.");
+                }
+                return;
+            }
+            case REQUEST_CAMERA_ENABLE: {
+                Log.i("INFO_SOTRAGE_CAMERA", "Se entra al case de REQUEST_CAMERA_ENABLE");
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("INFO_SOTRAGE_CAMERA", "Se conceden los permisos");
+                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                        File image = null;
+                        try {
+                            image = ImageHelper.createImageFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (image != null) {
+                            imageUri = Uri.fromFile(image);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                            startActivityForResult(intent, IMG_FROM_CAMERA);
+                        }
+                    }
+                } else {
+                    Log.i("INFO_SOTRAGE_CAMERA", "Se deniegan los permisos");
+                    showMessageDialog("ERROR: La app no puede utilizar esta funcionalidad porque no se han concedido" +
+                            " permisos de almacenamiento.\n\nINFO: La aplicación utiliza el almacenamiento para guardar y recuperar las" +
+                    " fotografías que utilizas en la app en la carpeta '/TrekkingAventura' de tu dispositivo.");
+                }
+                return;
+            }
+            case REQUEST_GALERY_ENABLE: {
+                Log.i("INFO_SOTRAGE_GALERY", "Se entra al case de REQUEST_GALERY_ENABLE");
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("INFO_SOTRAGE_GALERY", "Se conceden los permisos");
+                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                        File image = null;
+                        try {
+                            image = ImageHelper.createImageFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (image != null) {
+                            imageUri = Uri.fromFile(image);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                            startActivityForResult(intent, IMG_FROM_CAMERA);
+                        }
+                    }
+                } else {
+                    Log.i("INFO_SOTRAGE_GALERY", "Se deniegan los permisos");
+                    showMessageDialog("ERROR: La app no puede utilizar esta funcionalidad porque no se han concedido" +
+                            " permisos de almacenamiento.\n\nINFO: La aplicación utiliza el almacenamiento para guardar y recuperar las" +
+                            " fotografías que utilizas en la app en la carpeta '/TrekkingAventura' de tu dispositivo.");
                 }
                 return;
             }
@@ -480,23 +530,39 @@ public class FormExcursionesFragment extends Fragment implements
             public void onClick(DialogInterface dialog, int item) {
 
                 if (options[item].equals(options[0])) {
-                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                        File image = null;
-                        try {
-                            image = ImageHelper.createImageFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        if (image != null) {
-                            imageUri = Uri.fromFile(image);
-                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                            startActivityForResult(intent, IMG_FROM_CAMERA);
+                    // Comprobamos los permisos de almacenamiento
+                    if ((ContextCompat.checkSelfPermission(getContext(),Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                    && (ContextCompat.checkSelfPermission(getContext(),Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)){
+                        Log.i("INFO_STORAGE_CAMERA", "Se solicitan los permisos");
+                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_ENABLE);
+                    } else {
+                        Log.i("INFO_STORAGE_CAMERA", "El usuario tiene permisos");
+                        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                            File image = null;
+                            try {
+                                image = ImageHelper.createImageFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            if (image != null) {
+                                imageUri = Uri.fromFile(image);
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                                startActivityForResult(intent, IMG_FROM_CAMERA);
+                            }
                         }
                     }
                 } else if (options[item].equals(options[1])) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, IMG_FROM_GALLERY);
+                    // Comprobamos los permisos de almacenamiento
+                    if ((ContextCompat.checkSelfPermission(getContext(),Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                            && (ContextCompat.checkSelfPermission(getContext(),Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)){
+                        Log.i("INFO_STORAGE_GALERY", "Se solicitan los permisos");
+                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_GALERY_ENABLE);
+                    } else {
+                        Log.i("INFO_STORAGE_GALERY", "El usuario tiene permisos");
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, IMG_FROM_GALLERY);
+                    }
                 } else if (options[item].equals("Cancel")) {
                     dialog.dismiss();
                 }

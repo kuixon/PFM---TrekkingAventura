@@ -14,6 +14,10 @@ public class Excursion implements Serializable{
     private float longitude;
     private String imgPath;
 
+    public Excursion() {
+
+    }
+
     public Excursion(int id, String name, String opinion, String level, double travelDistance, String location, float latitude, float longitude, String imgPath) {
         this.id = id;
         this.name = name;
