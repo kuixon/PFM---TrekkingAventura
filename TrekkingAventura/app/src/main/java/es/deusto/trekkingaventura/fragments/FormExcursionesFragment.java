@@ -255,17 +255,18 @@ public class FormExcursionesFragment extends Fragment implements
                     // Subimos la imagen al servidor de Cloudinary.
                     // El formato del nombre de la imagen seria: 'idUsuario_idExcursion_idOpinion'
                     // Habría que meter los datos correctamente para que no pudiese haber dos imágenes
-                    // con el mismo nombre en el servidor.
+                    // con el mismo nombre en el servidor (lo del idOpinion lo ponemos así para los datos
+                    // de prueba, luego habría que ponerlo bien).
                     UploadImageTask task = new UploadImageTask();
                     task.execute(new String[]{excursion.getImgPath(), MainActivity.USER_ID + "_"
                             + Long.toString(excursion.getId()) + "_"
-                            + Long.toString(excursion.getId())});
+                            + Long.toString(arrExcursiones.size()+1)});
 
                     // Actualizamos el path de la excursión (esto también habría que hacerlo en BD)
                     excursion.setImgPath("http://res.cloudinary.com/trekkingaventura/image/upload/"
                             + MainActivity.USER_ID + "_"
                             + Long.toString(excursion.getId()) + "_"
-                            + Long.toString(excursion.getId()) + ".jpg");
+                            + Long.toString(arrExcursiones.size()+1) + ".jpg");
                 } else {
                     if (txtImage.getText().toString().equals("")) {
                         excursion.setImgPath("");
