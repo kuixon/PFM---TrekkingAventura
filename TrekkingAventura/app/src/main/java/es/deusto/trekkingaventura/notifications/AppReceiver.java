@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
@@ -70,12 +72,14 @@ public class AppReceiver extends BroadcastReceiver {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notification  = new NotificationCompat.Builder(this.context)
                 .setContentTitle("Mal tiempo en '" + excursion.getLocation() + "'.")
                 .setContentText("El tiempo actual en '" + excursion.getLocation() + "' es: '" + currentCondition + "'.")
                 .setContentIntent(pendingIntent)
                 .setColor(Color.parseColor("#A1CD5C"))
                 .setAutoCancel(true)
+                .setSound(alarmSound)
                 .setSmallIcon(R.drawable.notificationicon);
 
 
