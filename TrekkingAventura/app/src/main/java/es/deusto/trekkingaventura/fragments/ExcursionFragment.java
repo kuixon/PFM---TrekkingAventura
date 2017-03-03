@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.Weather;
-import es.deusto.trekkingaventura.utilities.JSONWeatherParser;
-import es.deusto.trekkingaventura.utilities.WeatherHttpClient;
+import es.deusto.trekkingaventura.weatherAPI.JSONWeatherParser;
+import es.deusto.trekkingaventura.weatherAPI.WeatherHttpClient;
 
 /**
  * Created by salgu on 15/02/2017.

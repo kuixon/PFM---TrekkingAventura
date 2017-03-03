@@ -1,4 +1,4 @@
-package es.deusto.trekkingaventura.utilities;
+package es.deusto.trekkingaventura.weatherAPI;
 
 import org.json.JSONArray;
 import org.json.JSONException;

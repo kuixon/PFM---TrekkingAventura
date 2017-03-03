@@ -7,21 +7,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.Weather;
-import es.deusto.trekkingaventura.utilities.JSONWeatherParser;
-import es.deusto.trekkingaventura.utilities.WeatherHttpClient;
+import es.deusto.trekkingaventura.weatherAPI.JSONWeatherParser;
+import es.deusto.trekkingaventura.weatherAPI.WeatherHttpClient;
 
 /**
  * Implementation of App Widget functionality.
