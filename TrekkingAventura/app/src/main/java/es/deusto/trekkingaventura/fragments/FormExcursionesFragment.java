@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
@@ -43,6 +44,7 @@ import java.util.Locale;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
 import es.deusto.trekkingaventura.utilities.ImageHelper;
 
 import static android.app.Activity.RESULT_OK;
@@ -269,6 +271,13 @@ public class FormExcursionesFragment extends Fragment implements
                     arrExcursiones.add(excursion);
                 }
 
+                // Prueba subida a Cloudinary
+                /*
+                if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty() && new File(excursion.getImgPath()).exists()) {
+                    UploadImageTask task = new UploadImageTask();
+                    task.execute(new String[]{excursion.getImgPath(), "prueba.jpg", "imageKey"});
+                }
+                */
                 Fragment fragment = new MisExcursionesFragment();
                 Bundle args = new Bundle();
                 args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
@@ -660,5 +669,13 @@ public class FormExcursionesFragment extends Fragment implements
         });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private class UploadImageTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... params) {
+            CloudinaryClient.uploadImage(params[0], params[1], params[2]);
+            return null;
+        }
     }
 }
