@@ -1,5 +1,7 @@
 package es.deusto.trekkingaventura.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.adapters.DrawerListAdapter;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.entities.InternetAlarm;
 import es.deusto.trekkingaventura.fragments.EmptyAppFragment;
 import es.deusto.trekkingaventura.fragments.EmptyFragment;
 import es.deusto.trekkingaventura.fragments.BuscarExcursionesFragment;
@@ -29,6 +32,7 @@ import es.deusto.trekkingaventura.fragments.AjustesFragment;
 import es.deusto.trekkingaventura.fragments.FormExcursionesFragment;
 import es.deusto.trekkingaventura.fragments.MisExcursionesFragment;
 import es.deusto.trekkingaventura.entities.DrawerItem;
+import es.deusto.trekkingaventura.utilities.InternetAlarmManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Para cuando se accede desde una notificación
     public static final String ARG_NOTIFICATION_EXC = "arg_notification_exc";
+
+    private static InternetAlarm internetAlarm = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +141,22 @@ public class MainActivity extends AppCompatActivity {
             args.putSerializable(ExcursionFragment.EXCURSION_KEY, getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC));
             fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+        }
+
+        // Se comprueba la alarma para saber si hay que lanzarla o no.
+        internetAlarm = (new InternetAlarmManager(this)).loadInternetAlarm();
+        if (internetAlarm == null) {
+            showMessageDialog("¡RECUERDA!" +
+            "\nLa app necesita conexión a Internet para poder desplegar todo su potencial:" +
+            "\n\t- Almacenamiento y recuperación de fotografías." +
+            "\n\t- Geolocalización." +
+            "\n\t- Conexión con nuestros servidores.");
+        } else if (internetAlarm.isAlarmOn()) {
+            showMessageDialog("¡RECUERDA!" +
+                    "\nLa app necesita conexión a Internet para poder desplegar todo su potencial:" +
+                    "\n\t- Almacenamiento y recuperación de fotografías." +
+                    "\n\t- Geolocalización." +
+                    "\n\t- Conexión con nuestros servidores.");
         }
     }
 
@@ -240,6 +262,32 @@ public class MainActivity extends AppCompatActivity {
         arrExcursiones.add(exc2);
         arrExcursiones.add(exc3);
         arrExcursiones.add(exc4);
+    }
+
+    public void showMessageDialog(String str) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(str);
+        builder.setCancelable(false);
+        builder.setPositiveButton("No volver a mostrar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                final InternetAlarm internetAlarm = new InternetAlarm(USER_ID, false);
+                (new InternetAlarmManager(MainActivity.this)).deleteFile();
+                (new InternetAlarmManager(MainActivity.this)).saveInternetAlarm(internetAlarm);
+            }
+        });
+        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                final InternetAlarm internetAlarm = new InternetAlarm(USER_ID, true);
+                (new InternetAlarmManager(MainActivity.this)).deleteFile();
+                (new InternetAlarmManager(MainActivity.this)).saveInternetAlarm(internetAlarm);
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     // Este listener redireccionará las peticiones que se realicen sobre cada uno de los
