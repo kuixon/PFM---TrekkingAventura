@@ -272,12 +272,11 @@ public class FormExcursionesFragment extends Fragment implements
                 }
 
                 // Prueba subida a Cloudinary
-                /*
                 if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty() && new File(excursion.getImgPath()).exists()) {
                     UploadImageTask task = new UploadImageTask();
-                    task.execute(new String[]{excursion.getImgPath(), "prueba.jpg", "imageKey"});
+                    task.execute(new String[]{excursion.getImgPath(), "image1"});
                 }
-                */
+
                 Fragment fragment = new MisExcursionesFragment();
                 Bundle args = new Bundle();
                 args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
@@ -674,7 +673,7 @@ public class FormExcursionesFragment extends Fragment implements
     private class UploadImageTask extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... params) {
-            CloudinaryClient.uploadImage(params[0], params[1], params[2]);
+            CloudinaryClient.uploadImage(params[0], params[1]);
             return null;
         }
     }
