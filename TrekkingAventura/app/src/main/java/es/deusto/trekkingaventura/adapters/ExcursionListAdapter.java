@@ -3,6 +3,7 @@ package es.deusto.trekkingaventura.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import java.util.List;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
+import es.deusto.trekkingaventura.imagesAPI.PicassoClient;
 
 public class ExcursionListAdapter extends ArrayAdapter<Excursion> {
 
@@ -42,11 +45,10 @@ public class ExcursionListAdapter extends ArrayAdapter<Excursion> {
             TextView txtLocation = (TextView) v.findViewById(R.id.excursionLocation);
             TextView txtDistance = (TextView) v.findViewById(R.id.excursionDistance);
 
-            if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty() || ! new File(excursion.getImgPath()).exists()) {
+            if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty()) {
                 imageExcursion.setImageResource(R.drawable.imgnotavailable);
             } else {
-                Bitmap thumbnail = (BitmapFactory.decodeFile(excursion.getImgPath()));
-                imageExcursion.setImageBitmap(thumbnail);
+                PicassoClient.downloadImage(getContext(), excursion.getImgPath(), imageExcursion);
             }
 
             txtName.setText(excursion.getName());

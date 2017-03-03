@@ -33,6 +33,7 @@ import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.Weather;
 import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
+import es.deusto.trekkingaventura.imagesAPI.PicassoClient;
 import es.deusto.trekkingaventura.weatherAPI.JSONWeatherParser;
 import es.deusto.trekkingaventura.weatherAPI.WeatherHttpClient;
 
@@ -110,18 +111,11 @@ public class ExcursionFragment extends Fragment {
         panelTiempo = (LinearLayout) rootView.findViewById(R.id.panelTiempo);
         panelTiempoNoDisponible = (LinearLayout) rootView.findViewById(R.id.panelTiempoNoDisponible);
 
-        /*
-        if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty() || ! new File(excursion.getImgPath()).exists()) {
+        if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty()) {
             imgExc.setImageResource(R.drawable.imgnotavailable);
         } else {
-            Bitmap thumbnail = (BitmapFactory.decodeFile(excursion.getImgPath()));
-            imgExc.setImageBitmap(thumbnail);
+            PicassoClient.downloadImage(getContext(), excursion.getImgPath(), imgExc);
         }
-        */
-
-        // Prueba de carga de imagen.
-        DownloadImageTask task2 = new DownloadImageTask();
-        task2.execute(new String[]{"image1.jpg"});
 
         txtName.setText(excursion.getName());
         txtDescription.setText(excursion.getOpinion());
@@ -207,28 +201,6 @@ public class ExcursionFragment extends Fragment {
             return true;
         } else {
             return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            String url = CloudinaryClient.downloadImage(params[0]);
-            Bitmap mImg = null;
-            try {
-                InputStream in = new java.net.URL(url).openStream();
-                mImg = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-            }
-            return mImg;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            imgExc.setImageBitmap(bitmap);
         }
     }
 

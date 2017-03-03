@@ -16,6 +16,7 @@ import java.util.List;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.imagesAPI.PicassoClient;
 
 /**
  * Created by salgu on 28/02/2017.
@@ -43,11 +44,10 @@ public class OpinionListAdapter extends ArrayAdapter<Excursion> {
             ImageView imageExcursion = (ImageView) v.findViewById(R.id.excursionImage);
             TextView txtOpinion = (TextView) v.findViewById(R.id.excursionOpinion);
 
-            if(opinion.getImgPath() == null || opinion.getImgPath().isEmpty() || ! new File(opinion.getImgPath()).exists()) {
+            if(opinion.getImgPath() == null || opinion.getImgPath().isEmpty()) {
                 imageExcursion.setImageResource(R.drawable.imgnotavailable);
             } else {
-                Bitmap thumbnail = (BitmapFactory.decodeFile(opinion.getImgPath()));
-                imageExcursion.setImageBitmap(thumbnail);
+                PicassoClient.downloadImage(getContext(), opinion.getImgPath(), imageExcursion);
             }
 
             txtOpinion.setText(opinion.getOpinion());

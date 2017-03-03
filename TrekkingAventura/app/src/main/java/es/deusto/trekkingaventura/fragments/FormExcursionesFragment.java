@@ -271,11 +271,12 @@ public class FormExcursionesFragment extends Fragment implements
                     arrExcursiones.add(excursion);
                 }
 
-                // Prueba subida a Cloudinary
+                /* Prueba subida a Cloudinary
                 if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty() && new File(excursion.getImgPath()).exists()) {
                     UploadImageTask task = new UploadImageTask();
                     task.execute(new String[]{excursion.getImgPath(), "image1"});
                 }
+                */
 
                 Fragment fragment = new MisExcursionesFragment();
                 Bundle args = new Bundle();

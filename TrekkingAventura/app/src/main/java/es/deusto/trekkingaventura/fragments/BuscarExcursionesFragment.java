@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.Toast;
-
-import com.google.android.gms.analytics.ExceptionReporter;
 
 import java.util.ArrayList;
 
