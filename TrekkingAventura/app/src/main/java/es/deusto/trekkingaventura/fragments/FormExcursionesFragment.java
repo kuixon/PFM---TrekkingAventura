@@ -2,12 +2,10 @@ package es.deusto.trekkingaventura.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
@@ -43,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 
 import es.deusto.trekkingaventura.R;
+import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
 import es.deusto.trekkingaventura.utilities.ImageHelper;
@@ -93,6 +92,7 @@ public class FormExcursionesFragment extends Fragment implements
     private Uri imageUri;
 
     private boolean editar;
+    private boolean localImagePath = false;
 
     public FormExcursionesFragment() {
 
@@ -163,7 +163,7 @@ public class FormExcursionesFragment extends Fragment implements
         deleteSelectedImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                excursion.setImgPath(null);
+                localImagePath = false;
                 txtImage.setText("");
                 txtImage.setVisibility(View.GONE);
                 deleteSelectedImg.setVisibility(View.GONE);
@@ -251,6 +251,27 @@ public class FormExcursionesFragment extends Fragment implements
                 excursion.setLatitude(Float.parseFloat(edtLatitude.getText().toString().trim()));
                 excursion.setLongitude(Float.parseFloat(edtLongitude.getText().toString().trim()));
 
+                if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty() && localImagePath) {
+                    // Subimos la imagen al servidor de Cloudinary.
+                    // El formato del nombre de la imagen seria: 'idUsuario_idExcursion_idOpinion'
+                    // Habría que meter los datos correctamente para que no pudiese haber dos imágenes
+                    // con el mismo nombre en el servidor.
+                    UploadImageTask task = new UploadImageTask();
+                    task.execute(new String[]{excursion.getImgPath(), MainActivity.USER_ID + "_"
+                            + Long.toString(excursion.getId()) + "_"
+                            + Long.toString(excursion.getId())});
+
+                    // Actualizamos el path de la excursión (esto también habría que hacerlo en BD)
+                    excursion.setImgPath("http://res.cloudinary.com/trekkingaventura/image/upload/"
+                            + MainActivity.USER_ID + "_"
+                            + Long.toString(excursion.getId()) + "_"
+                            + Long.toString(excursion.getId()) + ".jpg");
+                } else {
+                    if (txtImage.getText().toString().equals("")) {
+                        excursion.setImgPath("");
+                    }
+                }
+
                 if (editar) {
                     // Estamos editando un excursión existente
                     for (Excursion e : arrExcursiones) {
@@ -271,13 +292,6 @@ public class FormExcursionesFragment extends Fragment implements
                     arrExcursiones.add(excursion);
                 }
 
-                /* Prueba subida a Cloudinary
-                if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty() && new File(excursion.getImgPath()).exists()) {
-                    UploadImageTask task = new UploadImageTask();
-                    task.execute(new String[]{excursion.getImgPath(), "image1"});
-                }
-                */
-
                 Fragment fragment = new MisExcursionesFragment();
                 Bundle args = new Bundle();
                 args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
@@ -296,15 +310,10 @@ public class FormExcursionesFragment extends Fragment implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == IMG_FROM_CAMERA) {
             if (resultCode == RESULT_OK) {
+                localImagePath = true;
+
                 // Obtenemos la imagen sacada con la cámara y de momento no hacemos nada con ella
                 getContext().getContentResolver().notifyChange(imageUri, null);
-                ContentResolver cr = getContext().getContentResolver();
-                Bitmap bitmap;
-                try {
-                    bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, imageUri);
-                } catch (Exception e) {
-                    Log.d("APP", "Failed to load", e);
-                }
 
                 // Cambiamos el el TextView con el Path de la foto.
                 txtImage.setText(imageUri.getPath());
@@ -314,6 +323,8 @@ public class FormExcursionesFragment extends Fragment implements
             }
         } else if (requestCode == IMG_FROM_GALLERY) {
             if (resultCode == RESULT_OK) {
+                localImagePath = true;
+
                 Uri selectedImage = data.getData();
                 String[] filePath = {MediaStore.Images.Media.DATA};
                 Cursor c = getContext().getContentResolver().query(selectedImage, filePath, null, null, null);
@@ -447,7 +458,7 @@ public class FormExcursionesFragment extends Fragment implements
         edtLatitude.setText(Float.toString(excursion.getLatitude()));
         edtLongitude.setText(Float.toString(excursion.getLongitude()));
 
-        if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty() && new File(excursion.getImgPath()).exists()) {
+        if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty()) {
             txtImage.setText(excursion.getImgPath());
             txtImage.setVisibility(View.VISIBLE);
             deleteSelectedImg.setVisibility(View.VISIBLE);

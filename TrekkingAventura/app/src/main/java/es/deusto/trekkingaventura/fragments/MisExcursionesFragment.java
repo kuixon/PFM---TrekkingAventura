@@ -74,6 +74,7 @@ public class MisExcursionesFragment extends Fragment implements GoogleApiClient.
         arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_MIS_EXCURSIONES);
         arrExcursionesFiltered = new ArrayList<Excursion>();
         for (Excursion e : arrExcursiones) {
+            Log.i("URL_EXCURSION", e.getImgPath());
             arrExcursionesFiltered.add(e);
         }
 
