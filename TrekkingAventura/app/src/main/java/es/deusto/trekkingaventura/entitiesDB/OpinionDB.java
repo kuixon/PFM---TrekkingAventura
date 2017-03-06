@@ -8,9 +8,9 @@ import java.io.Serializable;
 
 public class OpinionDB implements Serializable {
 
-    private long idOpinion;
+    private int idOpinion;
     private String idUsuario;
-    private long idExcursion;
+    private int idExcursion;
     private String opinion;
     private String foto;
 
@@ -18,18 +18,18 @@ public class OpinionDB implements Serializable {
 
     }
 
-    public OpinionDB(String idUsuario, long idExcursion, String opinion, String foto) {
+    public OpinionDB(String idUsuario, int idExcursion, String opinion, String foto) {
         this.idUsuario = idUsuario;
         this.idExcursion = idExcursion;
         this.opinion = opinion;
         this.foto = foto;
     }
 
-    public long getIdOpinion() {
+    public int getIdOpinion() {
         return idOpinion;
     }
 
-    public void setIdOpinion(long idOpinion) {
+    public void setIdOpinion(int idOpinion) {
         this.idOpinion = idOpinion;
     }
 
@@ -41,11 +41,11 @@ public class OpinionDB implements Serializable {
         this.idUsuario = idUsuario;
     }
 
-    public long getIdExcursion() {
+    public int getIdExcursion() {
         return idExcursion;
     }
 
-    public void setIdExcursion(long idExcursion) {
+    public void setIdExcursion(int idExcursion) {
         this.idExcursion = idExcursion;
     }
 

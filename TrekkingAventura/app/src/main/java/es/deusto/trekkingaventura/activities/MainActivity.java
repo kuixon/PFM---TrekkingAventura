@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Obtenemos el ID del Usuario
         USER_ID = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+        Log.i("INFO_USER_ID", USER_ID);
 
         // Inicializamos la lista de excursiones
         createExcursionList();

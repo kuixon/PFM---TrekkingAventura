@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class ExcursionDB implements Serializable {
 
-    private long idExcursion;
+    private int idExcursion;
     private String nombre;
     private String nivel;
     private String lugar;
@@ -31,11 +31,11 @@ public class ExcursionDB implements Serializable {
         this.longitud = longitud;
     }
 
-    public long getIdExcursion() {
+    public int getIdExcursion() {
         return idExcursion;
     }
 
-    public void setIdExcursion(long idExcursion) {
+    public void setIdExcursion(int idExcursion) {
         this.idExcursion = idExcursion;
     }
 
