@@ -1,9 +1,6 @@
 package es.deusto.trekkingaventura.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +8,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.List;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
-import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
 import es.deusto.trekkingaventura.imagesAPI.PicassoClient;
 
 public class ExcursionListAdapter extends ArrayAdapter<Excursion> {
@@ -45,13 +40,25 @@ public class ExcursionListAdapter extends ArrayAdapter<Excursion> {
             TextView txtLocation = (TextView) v.findViewById(R.id.excursionLocation);
             TextView txtDistance = (TextView) v.findViewById(R.id.excursionDistance);
 
-            if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty()) {
+            if (excursion.getImgPath() == null || excursion.getImgPath().isEmpty()) {
                 imageExcursion.setImageResource(R.drawable.imgnotavailable);
             } else {
-                PicassoClient.downloadImage(getContext(), excursion.getImgPath(), imageExcursion);
+                if (excursion.getImgPath().equals("Banner Ropa")) {
+                    imageExcursion.setImageResource(R.drawable.banner_ropa);
+                } else if (excursion.getImgPath().equals("Banner Transporte")) {
+                    imageExcursion.setImageResource(R.drawable.banner_transporte);
+                } else {
+                    PicassoClient.downloadImage(getContext(), excursion.getImgPath(), imageExcursion);
+                }
             }
 
-            txtName.setText(excursion.getName());
+            if (excursion.getName().equals("Banner Ropa")) {
+                txtName.setText("");
+            } else if(excursion.getName().equals("Banner Transporte")) {
+                txtName.setText("");
+            } else {
+                txtName.setText(excursion.getName());
+            }
 
             switch (excursion.getLevel()) {
                 case "Facil":
@@ -63,9 +70,22 @@ public class ExcursionListAdapter extends ArrayAdapter<Excursion> {
                 case "Dificil":
                     imageLevel.setImageResource(R.drawable.dificil);
                     break;
+                default:
+                    imageLevel.setImageResource(android.R.color.transparent);
+                    break;
             }
-            txtLocation.setText(excursion.getLocation());
-            txtDistance.setText(Double.toString(excursion.getTravelDistance()) + " km");
+
+            if (excursion.getLocation().equals("")) {
+                txtLocation.setText("Publicidad");
+            } else {
+                txtLocation.setText(excursion.getLocation());
+            }
+
+            if (excursion.getTravelDistance() == 0) {
+                txtDistance.setText("");
+            } else {
+                txtDistance.setText(Double.toString(excursion.getTravelDistance()) + " km");
+            }
         }
 
         return v;

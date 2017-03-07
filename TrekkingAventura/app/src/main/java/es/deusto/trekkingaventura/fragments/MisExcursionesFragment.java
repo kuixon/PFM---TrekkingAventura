@@ -28,8 +28,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import es.deusto.trekkingaventura.R;
+import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.adapters.ExcursionListAdapter;
 import es.deusto.trekkingaventura.entities.Excursion;
 
