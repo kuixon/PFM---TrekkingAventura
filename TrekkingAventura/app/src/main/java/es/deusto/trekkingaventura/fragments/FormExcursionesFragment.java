@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -81,6 +82,9 @@ public class FormExcursionesFragment extends Fragment implements
     private EditText edtLocation;
     private EditText edtDistance;
     private RadioGroup rdgLevel;
+    private RadioButton rbtnLow;
+    private RadioButton rbtnMedium;
+    private RadioButton rbtnHigh;
     private EditText edtLatitude;
     private EditText edtLongitude;
     private Button btnGeolocate;
@@ -127,6 +131,9 @@ public class FormExcursionesFragment extends Fragment implements
         edtDistance = (EditText) rootView.findViewById(R.id.edtDistance);
 
         rdgLevel = (RadioGroup) rootView.findViewById(R.id.radioGroup);
+        rbtnLow = (RadioButton) rootView.findViewById(R.id.button_level_low);
+        rbtnMedium = (RadioButton) rootView.findViewById(R.id.button_level_medium);
+        rbtnHigh = (RadioButton) rootView.findViewById(R.id.button_level_high);
         rdgLevel.check(R.id.button_level_low);
 
         edtLatitude = (EditText) rootView.findViewById(R.id.edtLatitude);
@@ -464,6 +471,16 @@ public class FormExcursionesFragment extends Fragment implements
             txtImage.setVisibility(View.VISIBLE);
             deleteSelectedImg.setVisibility(View.VISIBLE);
         }
+
+        // Desactivamos los campos propios de la Excursión que no pueden ser editados.
+        edtName.setEnabled(false);
+        edtLocation.setEnabled(false);
+        edtDistance.setEnabled(false);
+        rbtnLow.setEnabled(false);
+        rbtnMedium.setEnabled(false);
+        rbtnHigh.setEnabled(false);
+        edtLatitude.setEnabled(false);
+        edtLongitude.setEnabled(false);
     }
 
     private boolean validateFields() {
