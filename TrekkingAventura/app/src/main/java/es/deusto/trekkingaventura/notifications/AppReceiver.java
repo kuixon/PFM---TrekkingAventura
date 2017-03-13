@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -20,6 +21,7 @@ import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.Weather;
+import es.deusto.trekkingaventura.utilities.ExcursionNotificationManager;
 import es.deusto.trekkingaventura.weatherAPI.JSONWeatherParser;
 import es.deusto.trekkingaventura.weatherAPI.WeatherHttpClient;
 
@@ -31,10 +33,6 @@ public class AppReceiver extends BroadcastReceiver {
 
     private Context context;
 
-    public static final String ARG_EXCURSION = "arg_excursion";
-    public static final String ALARM_SERVICE = "alarm_service";
-    public static final String ALARM_SERVICE_CONTENT = "alarm_service_content";
-
     private Excursion excursion;
     private String currentCondition;
 
@@ -44,13 +42,13 @@ public class AppReceiver extends BroadcastReceiver {
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
 
+        excursion = (new ExcursionNotificationManager(context)).loadExcursionNotification();
+
         if (sharedPref.getBoolean("notifications",false)) {
             if(intent.getAction() != null && intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
                 NotificationService.getInstance(context).startAlarm();
-            } else if (intent.getStringExtra(ALARM_SERVICE).equals(ALARM_SERVICE_CONTENT)) {
+            } else if (excursion != null) {
                 Log.i("INFO_NOT", "Se reciben las alarmas desde AppReceiver");
-                excursion = (Excursion) intent.getSerializableExtra(ARG_EXCURSION);
-
                 // Se realiza la petición a la API del tiempo.
                 String city = excursion.getLocation();
                 String cityWithoutSpaces = city.replace(" ", "%20");
@@ -60,6 +58,8 @@ public class AppReceiver extends BroadcastReceiver {
                 } else {
                     task.execute(new String[]{city});
                 }
+            } else {
+                Log.i("EXCURSION_NULL", "Excursion: " + excursion);
             }
         }
     }

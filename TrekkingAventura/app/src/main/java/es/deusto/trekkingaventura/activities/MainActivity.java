@@ -129,12 +129,22 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.setDrawerListener(drawerToggle);
 
         if (savedInstanceState == null) {
-            selectItem(1);
+            if (getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC) != null) {
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyAppFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyFragment()).commit();
+
+                Fragment fragment = new ExcursionFragment();
+                Bundle args = new Bundle();
+                args.putSerializable(ExcursionFragment.EXCURSION_KEY, getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC));
+                fragment.setArguments(args);
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            } else {
+                selectItem(1);
+            }
         }
 
         // Cuando llegamos a esta actividad desde una notificación
         if(getIntent().getAction().equals("OPEN_EXC_FRAGMENT")) {
-            Log.i("INFO_NOT", "Se entra a MainActivity tras clickar la notificacion");
             getFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyAppFragment()).commit();
             getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyFragment()).commit();
 
@@ -153,12 +163,6 @@ public class MainActivity extends AppCompatActivity {
             "\n\t- Almacenamiento y recuperación de fotografías." +
             "\n\t- Geolocalización." +
             "\n\t- Conexión con nuestros servidores.");
-        } else if (internetAlarm.isAlarmOn()) {
-            showMessageDialog("¡RECUERDA!" +
-                    "\nLa app necesita conexión a Internet para poder desplegar todo su potencial:" +
-                    "\n\t- Almacenamiento y recuperación de fotografías." +
-                    "\n\t- Geolocalización." +
-                    "\n\t- Conexión con nuestros servidores.");
         }
     }
 
@@ -289,9 +293,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                final InternetAlarm internetAlarm = new InternetAlarm(USER_ID, true);
                 (new InternetAlarmManager(MainActivity.this)).deleteFile();
-                (new InternetAlarmManager(MainActivity.this)).saveInternetAlarm(internetAlarm);
             }
         });
         AlertDialog alert = builder.create();

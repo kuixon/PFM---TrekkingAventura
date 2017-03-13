@@ -27,14 +27,10 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
     private boolean notifications_enabled;
     private Excursion excursion;
 
-    private Activity activity;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
-
-        activity = getActivity();
 
         arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_MIS_EXCURSIONES);
 
@@ -75,6 +71,12 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
 
         notifications_enabled = sharedPreferences.getBoolean("notifications", false);
 
+        if (notifications_enabled) {
+            this.findPreference("excursiones").setEnabled(false);
+        } else {
+            this.findPreference("excursiones").setEnabled(true);
+        }
+
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -101,16 +103,18 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
                 int id = Integer.parseInt(sharedPreferences.getString("excursiones", ""));
                 excursion = getExcursionById(id);
                 if (excursion != null) {
-                    NotificationService.getInstance(getActivity()).setExcursion(excursion);
-                    NotificationService.getInstance(getActivity()).startAlarm();
-                    Toast.makeText(activity,
+                    this.findPreference("excursiones").setEnabled(false);
+                    NotificationService.getInstance(getActivity().getApplicationContext()).setExcursion(excursion);
+                    NotificationService.getInstance(getActivity().getApplicationContext()).startAlarm();
+                    Toast.makeText(getActivity(),
                             "*Notificaciones ACTIVADAS* \nA partir de ahora recibiras una notificación cuando haga mal tiempo en" +
                                     " el lugar de la excursión seleccionada.", Toast.LENGTH_LONG).show();
                 }
             } else {
                 notifications_enabled = false;
-                NotificationService.getInstance(getActivity()).stopAlarm();
-                Toast.makeText(activity,
+                this.findPreference("excursiones").setEnabled(true);
+                NotificationService.getInstance(getActivity().getApplicationContext()).stopAlarm();
+                Toast.makeText(getActivity(),
                         "*Notificaciones DESACTIVADAS* \nA partir de ahora NO recibiras una notificación cuando haga mal tiempo en" +
                                 " el lugar de la excursión seleccionada.", Toast.LENGTH_LONG).show();
             }
