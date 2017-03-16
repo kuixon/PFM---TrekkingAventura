@@ -2,13 +2,10 @@ package es.deusto.trekkingaventura.entitiesDB;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Created by salgu on 01/03/2017.
  */
 
-@XmlRootElement
 public class ExcursionDB implements Serializable {
 
     private int idExcursion;

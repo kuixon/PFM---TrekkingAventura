@@ -1,8 +1,10 @@
 package es.deusto.trekkingaventura.activities;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,12 +20,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.adapters.DrawerListAdapter;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.InternetAlarm;
+import es.deusto.trekkingaventura.entitiesDB.UsuarioDB;
 import es.deusto.trekkingaventura.fragments.EmptyAppFragment;
 import es.deusto.trekkingaventura.fragments.EmptyFragment;
 import es.deusto.trekkingaventura.fragments.BuscarExcursionesFragment;
@@ -32,6 +37,8 @@ import es.deusto.trekkingaventura.fragments.AjustesFragment;
 import es.deusto.trekkingaventura.fragments.FormExcursionesFragment;
 import es.deusto.trekkingaventura.fragments.MisExcursionesFragment;
 import es.deusto.trekkingaventura.entities.DrawerItem;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
 import es.deusto.trekkingaventura.utilities.InternetAlarmManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     /*
      DECLARACIONES
      */
-    public static String USER_ID;
+    public static UsuarioDB usuario;
 
     private Toolbar toolbar;
 
@@ -66,9 +73,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Obtenemos el ID del Usuario
-        USER_ID = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
-        Log.i("INFO_USER_ID", USER_ID);
+        // Obtenemos el ID del Usuario y lo insertamos en la BD si es que no existe aun.
+        usuario = new UsuarioDB();
+        usuario.setIdUsuario(Secure.getString(getContentResolver(), Secure.ANDROID_ID));
+        Log.i("INFO_USER", "Id: " + usuario.getIdUsuario());
+        ObtenerUsuarioTask task = new ObtenerUsuarioTask();
+        task.execute(new String[]{usuario.getIdUsuario()});
 
         // Inicializamos la lista de excursiones
         createExcursionList();
@@ -284,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                final InternetAlarm internetAlarm = new InternetAlarm(USER_ID, false);
+                final InternetAlarm internetAlarm = new InternetAlarm(usuario.getIdUsuario(), false);
                 (new InternetAlarmManager(MainActivity.this)).deleteFile();
                 (new InternetAlarmManager(MainActivity.this)).saveInternetAlarm(internetAlarm);
             }
@@ -309,4 +319,51 @@ public class MainActivity extends AppCompatActivity {
             selectItem(position);
         }
     }
+
+    private class ObtenerUsuarioTask extends AsyncTask<String, Void, UsuarioDB> {
+        ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Obteniendo datos del usuario...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected UsuarioDB doInBackground(String... params) {
+            UsuarioDB usuario = new UsuarioDB();
+
+            String data = ((new RestClientManager()).obtenerUsuarioPorId(params[0]));
+            if (data != null) {
+                try {
+                    usuario = RestJSONParserManager.getUsuarioDB(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.i("Error", "El usuario no existe en la Base de Datos");
+                usuario = null;
+            }
+
+            return usuario;
+        }
+
+        @Override
+        protected void onPostExecute(UsuarioDB usuarioDB) {
+            super.onPostExecute(usuarioDB);
+            if (usuarioDB != null) {
+                usuario = usuarioDB;
+                Log.i("USUARIO", "El usuario ya existe");
+                Log.i("Id Usuario existente", usuario.getIdUsuario());
+            } else {
+                // Insertar el usuario.
+                Log.i("USUARIO", "Insertar usuario");
+            }
+            progressDialog.dismiss();
+        }
+    }
+    
 }
