@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -334,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected UsuarioDB doInBackground(String... params) {
-            UsuarioDB usuario = new UsuarioDB();
+            UsuarioDB usuario = null;
 
             String data = ((new RestClientManager()).obtenerUsuarioPorId(params[0]));
             if (data != null) {
@@ -343,9 +344,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            } else {
-                Log.i("Error", "El usuario no existe en la Base de Datos");
-                usuario = null;
             }
 
             return usuario;
@@ -355,15 +353,59 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(UsuarioDB usuarioDB) {
             super.onPostExecute(usuarioDB);
             if (usuarioDB != null) {
+                // Si el usuario ya existe, inicializamos la variable 'usuario' de la clase
                 usuario = usuarioDB;
                 Log.i("USUARIO", "El usuario ya existe");
-                Log.i("Id Usuario existente", usuario.getIdUsuario());
+                Log.i("USUARIO", "Id Usuario existente: " + usuario.getIdUsuario());
             } else {
                 // Insertar el usuario.
                 Log.i("USUARIO", "Insertar usuario");
+                InsertarUsuarioTask task = new InsertarUsuarioTask();
+                task.execute(new UsuarioDB[]{new UsuarioDB(usuario.getIdUsuario())});
             }
             progressDialog.dismiss();
         }
     }
-    
+
+    private class InsertarUsuarioTask extends AsyncTask<UsuarioDB, Void, UsuarioDB> {
+        ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Almacenando datos del usuario...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected UsuarioDB doInBackground(UsuarioDB... params) {
+            UsuarioDB usuario = null;
+
+            String data = ((new RestClientManager()).insertarUsuario(params[0]));
+            if (data != null) {
+                try {
+                    usuario = RestJSONParserManager.getUsuarioDB(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return usuario;
+        }
+
+        @Override
+        protected void onPostExecute(UsuarioDB usuarioDB) {
+            super.onPostExecute(usuarioDB);
+            if (usuarioDB != null) {
+                // Se ha insertado correctamente el usuario.
+                Log.i("USUARIO", "El usuario '" + usuarioDB.getIdUsuario() + "' se ha insertado correctamente");
+            } else {
+                // Insertar el usuario.
+                Log.i("USUARIO", "No se ha podido insertar el usuario");
+            }
+            progressDialog.dismiss();
+        }
+    }
 }
