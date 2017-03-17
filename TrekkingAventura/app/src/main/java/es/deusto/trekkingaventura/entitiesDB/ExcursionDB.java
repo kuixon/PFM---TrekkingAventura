@@ -21,7 +21,8 @@ public class ExcursionDB implements Serializable {
 
     }
 
-    public ExcursionDB(String nombre, String nivel, String lugar, double distancia, String foto, float latitud, float longitud) {
+    public ExcursionDB(int idExcursion, String nombre, String nivel, String lugar, double distancia, String foto, float latitud, float longitud) {
+        this.idExcursion = idExcursion;
         this.nombre = nombre;
         this.nivel = nivel;
         this.lugar = lugar;

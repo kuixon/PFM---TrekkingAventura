@@ -29,6 +29,7 @@ import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.adapters.DrawerListAdapter;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.InternetAlarm;
+import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entitiesDB.UsuarioDB;
 import es.deusto.trekkingaventura.fragments.EmptyAppFragment;
 import es.deusto.trekkingaventura.fragments.EmptyFragment;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private String[] tagTitles;
 
     private ArrayList<Excursion> arrExcursiones;
+    private ArrayList<OpinionExtendida> arrOpinionesExtendidas;
 
     // Para cuando se accede desde una notificación
     public static final String ARG_NOTIFICATION_EXC = "arg_notification_exc";
@@ -74,15 +76,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Obtenemos el ID del Usuario y lo insertamos en la BD si es que no existe aun.
         usuario = new UsuarioDB();
         usuario.setIdUsuario(Secure.getString(getContentResolver(), Secure.ANDROID_ID));
         Log.i("INFO_USER", "Id: " + usuario.getIdUsuario());
-        ObtenerUsuarioTask task = new ObtenerUsuarioTask();
-        task.execute(new String[]{usuario.getIdUsuario()});
-
-        // Inicializamos la lista de excursiones
-        createExcursionList();
 
         // Ponemos nuestra Toolbar personalizada como action bar.
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -150,7 +146,9 @@ public class MainActivity extends AppCompatActivity {
                 fragment.setArguments(args);
                 getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             } else {
-                selectItem(1);
+                // Comprobamos si el usuario existe en la BD y si no existe lo insertamos.
+                ObtenerUsuarioTask task = new ObtenerUsuarioTask();
+                task.execute(new String[]{usuario.getIdUsuario()});
             }
         }
 
@@ -266,27 +264,6 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.closeDrawer(drawerList);
     }
 
-    private void createExcursionList() {
-
-        // Creamos tres excursiones de prueba y las metemos al array de Excursiones.
-        Excursion exc1 = new Excursion(1,"Ruta del Cares", "Un sitio espectacular con unas vistas impresionantes. Ideal para ir con la familia y para sacar fotos de los acantilados.", "Medio", 12,"Arenas de Cabrales",Float.parseFloat("43.253143"),Float.parseFloat("-4.844181"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_1_1.jpg");
-        Excursion exc2 = new Excursion(2,"Ventana Relux", "Unas vistas impresionantes desde la ventana. Una caída libre espectacular que merece ser fotografiada. Ideal para la familia.", "Facil", 2.7,"Karrantza Harana",Float.parseFloat("43.250062"),Float.parseFloat("-3.411184"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_2_2.jpg");
-        Excursion exc3 = new Excursion(3,"Faro del Caballo", "Excursión muy bonita para ver todos los acantilados del monte Buciero de Santoña. Ideal para ir en pareja y para pasar el día.", "Medio", 12,"Santoña",Float.parseFloat("43.451673"),Float.parseFloat("-3.425712"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_3_3.jpg");
-        Excursion exc4 = new Excursion(4,"Gorbea", "Subida preciosa a uno de los montes más característicos de Bizkaia. Recorrido un poco duro pero el paisaje merece la pena.", "Dificil", 12,"Areatza",Float.parseFloat("43.034984"),Float.parseFloat("-2.779891"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_4_4.jpg");
-        Excursion exc5 = new Excursion(5,"Ruta del Río Borosa", "Espectacular ruta que nos permite apreciar toda la belleza del Rio Borosa y del Parque Nacional de la Sierra de Cazorla.", "Facil", 20,"Jaén",Float.parseFloat("38.009718"),Float.parseFloat("-2.858513"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_5_5.jpg");
-        Excursion exc6 = new Excursion(6,"Chachorros del Río Chiller", "Explorarás un paisaje en el que el agua es tan protagonista que lo mejor que puedes hacer es llevar un calzado que no te importe que se moje.", "Facil", 15,"Nerja",Float.parseFloat("36.831615"),Float.parseFloat("-3.853639"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_6_6.jpg");
-        Excursion exc7 = new Excursion(7,"Ruta de los Pantaneros", "Fabuloso descenso de 80 metros del cañón y cruzar varios puentes colgantes que te llevarán a través de paisajes de Bosque de Ribera y Matorral Mediterráneo.", "Dificil", 5,"Chulilla",Float.parseFloat("39.670969"),Float.parseFloat("-0.888563"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_7_7.jpg");
-
-        arrExcursiones = new ArrayList<Excursion>();
-        arrExcursiones.add(exc1);
-        arrExcursiones.add(exc2);
-        arrExcursiones.add(exc3);
-        arrExcursiones.add(exc4);
-        arrExcursiones.add(exc5);
-        arrExcursiones.add(exc6);
-        arrExcursiones.add(exc7);
-    }
-
     public void showMessageDialog(String str) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(str);
@@ -357,6 +334,10 @@ public class MainActivity extends AppCompatActivity {
                 usuario = usuarioDB;
                 Log.i("USUARIO", "El usuario ya existe");
                 Log.i("USUARIO", "Id Usuario existente: " + usuario.getIdUsuario());
+
+                // Inicializamos la lista de excursiones
+                InicializarExcursionesTask task = new InicializarExcursionesTask();
+                task.execute(new String[]{usuario.getIdUsuario()});
             } else {
                 // Insertar el usuario.
                 Log.i("USUARIO", "Insertar usuario");
@@ -401,10 +382,67 @@ public class MainActivity extends AppCompatActivity {
             if (usuarioDB != null) {
                 // Se ha insertado correctamente el usuario.
                 Log.i("USUARIO", "El usuario '" + usuarioDB.getIdUsuario() + "' se ha insertado correctamente");
+
+                // Inicializamos la lista de excursiones
+                InicializarExcursionesTask taskExcursiones = new InicializarExcursionesTask();
+                taskExcursiones.execute(new String[]{usuarioDB.getIdUsuario()});
             } else {
                 // Insertar el usuario.
                 Log.i("USUARIO", "No se ha podido insertar el usuario");
             }
+            progressDialog.dismiss();
+        }
+    }
+
+    private class InicializarExcursionesTask extends AsyncTask<String, Void, ArrayList<OpinionExtendida>> {
+        ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Cargando excursiones del usuario...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<OpinionExtendida> doInBackground(String... params) {
+            ArrayList<OpinionExtendida> aloe = null;
+
+            String data = ((new RestClientManager()).obtenerOpinionesUsuario(params[0]));
+            if (data != null) {
+                try {
+                    aloe = RestJSONParserManager.getOpinionesExtendidas(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return aloe;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<OpinionExtendida> aloe) {
+            super.onPostExecute(aloe);
+            if (aloe != null) {
+                // El usuario tiene excursiones
+                Log.i("EXCURSIONES", "El usuario '" + usuario.getIdUsuario() + "' tiene excursiones");
+                arrExcursiones = new ArrayList<Excursion>();
+                for (OpinionExtendida oe : aloe) {
+                    arrExcursiones.add(new Excursion(oe.getExcursion().getIdExcursion(), oe.getExcursion().getNombre(),
+                            oe.getOpinion(), oe.getExcursion().getNivel(), oe.getExcursion().getDistancia(),
+                            oe.getExcursion().getLugar(), oe.getExcursion().getLatitud(), oe.getExcursion().getLongitud(),
+                            oe.getImgPath()));
+                }
+            } else {
+                // El usuario no tiene excursiones
+                arrExcursiones = new ArrayList<Excursion>();
+                Log.i("EXCURSIONES", "El usuario no tiene excursiones");
+            }
+
+            selectItem(0);
+
             progressDialog.dismiss();
         }
     }
