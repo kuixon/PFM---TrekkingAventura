@@ -435,13 +435,15 @@ public class MainActivity extends AppCompatActivity {
                             oe.getExcursion().getLugar(), oe.getExcursion().getLatitud(), oe.getExcursion().getLongitud(),
                             oe.getImgPath()));
                 }
+                arrOpinionesExtendidas = aloe;
             } else {
                 // El usuario no tiene excursiones
                 arrExcursiones = new ArrayList<Excursion>();
+                arrOpinionesExtendidas = new ArrayList<OpinionExtendida>();
                 Log.i("EXCURSIONES", "El usuario no tiene excursiones");
             }
 
-            selectItem(0);
+            selectItem(1);
 
             progressDialog.dismiss();
         }
