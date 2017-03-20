@@ -10,6 +10,7 @@ import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.ExcursionDestacada;
 import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entitiesDB.ExcursionDB;
+import es.deusto.trekkingaventura.entitiesDB.OpinionDB;
 import es.deusto.trekkingaventura.entitiesDB.UsuarioDB;
 
 /**
@@ -114,5 +115,30 @@ public class RestJSONParserManager {
         }
 
         return ale;
+    }
+
+    public static ArrayList<OpinionDB> getOpinionesPorIdExcursion(String data) throws JSONException {
+        ArrayList<OpinionDB> alo = new ArrayList<OpinionDB>();
+
+        JSONObject root = new JSONObject(data);
+        JSONArray opiniones = root.getJSONArray("opinion");
+
+        OpinionDB o;
+        JSONObject opinion;
+        for (int i = 0; i < opiniones.length(); i++) {
+            o = new OpinionDB();
+
+            opinion = opiniones.getJSONObject(i);
+
+            o.setIdOpinion(opinion.getInt("idOpinion"));
+            o.setIdUsuario(opinion.getString("idUsuario"));
+            o.setIdExcursion(opinion.getInt("idExcursion"));
+            o.setOpinion(opinion.getString("opinion"));
+            o.setFoto(opinion.getString("foto"));
+
+            alo.add(o);
+        }
+
+        return alo;
     }
 }

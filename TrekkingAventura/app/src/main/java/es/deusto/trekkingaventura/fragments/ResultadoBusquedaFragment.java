@@ -1,7 +1,9 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,11 +16,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.adapters.ExcursionListAdapter;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.entitiesDB.OpinionDB;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
 
 import static es.deusto.trekkingaventura.fragments.FormExcursionesFragment.ARG_FORM_EXCURSIONES_TITLE;
 
@@ -34,6 +41,8 @@ public class ResultadoBusquedaFragment extends Fragment {
     private ListView listExcursiones;
     private ArrayList<Excursion> arrExcursiones;
     private ExcursionListAdapter adpExcursiones;
+
+    public static boolean firstTime = true;
 
     public ResultadoBusquedaFragment() {
 
@@ -74,24 +83,8 @@ public class ResultadoBusquedaFragment extends Fragment {
                     Intent i = new Intent(Intent.ACTION_VIEW,uri);
                     startActivity(i);
                 } else {
-                    // En este punto, tendríamos que buscar todas las opiniones asociadas a la excursión
-                    // clickada y pasárselas como parámetro al fragment de las opiniones. De momento,
-                    // se le pasan algunas excursiones a modo de prueba a la variable ARG_OPINIONES
-                    // (hasta que haya persistencia de datos).
-                    ArrayList<Excursion> opiniones = new ArrayList<Excursion>();
-                    opiniones.add(arrExcursiones.get(position));
-                    if (position + 1 == arrExcursiones.size()) {
-                        opiniones.add(arrExcursiones.get(position-1));
-                    } else {
-                        opiniones.add(arrExcursiones.get(position+1));
-                    }
-
-                    Fragment fragment = new OpinionesExcursionFragment();
-                    Bundle args = new Bundle();
-                    args.putSerializable(OpinionesExcursionFragment.ARG_RESULTADO_BUSQUEDA, arrExcursiones);
-                    args.putSerializable(OpinionesExcursionFragment.ARG_OPINIONES, opiniones);
-                    fragment.setArguments(args);
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+                    InicializarOpinionesTask task = new InicializarOpinionesTask();
+                    task.execute(new Excursion[] {arrExcursiones.get(position)});
                 }
             }
         });
@@ -102,7 +95,9 @@ public class ResultadoBusquedaFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.opiniones_excursiones, menu);
+        if (!firstTime) {
+            inflater.inflate(R.menu.opiniones_excursiones, menu);
+        }
     }
 
     @Override
@@ -115,9 +110,81 @@ public class ResultadoBusquedaFragment extends Fragment {
             args.putInt(BuscarExcursionesFragment.ARG_BUSCAR_EXCURSIONES_NUMBER, 1);
             fragment.setArguments(args);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+            firstTime = false;
+
             return true;
         } else {
             return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private class InicializarOpinionesTask extends AsyncTask<Excursion, Void, ArrayList<OpinionDB>> {
+        String nombreExcursion = "";
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Cargando opiniones...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<OpinionDB> doInBackground(Excursion... params) {
+            nombreExcursion = params[0].getName();
+
+            ArrayList<OpinionDB> alo = null;
+
+            String data = (new RestClientManager()).obtenerOpinionesPorIdExcursion(params[0].getId());
+            if (data != null) {
+                try {
+                    alo = RestJSONParserManager.getOpinionesPorIdExcursion(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return alo;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<OpinionDB> alo) {
+            super.onPostExecute(alo);
+            if (alo != null) {
+                // Hay resultado de búsqueda
+                Log.i("OPINIONES_EXCURSION", "La excursión tiene opiniones");
+
+                ArrayList<Excursion> opiniones = new ArrayList<Excursion>();
+                for (OpinionDB o : alo) {
+                    opiniones.add(new Excursion(o.getIdExcursion(), nombreExcursion, o.getOpinion(), "", 0, "", 0f, 0f, o.getFoto()));
+                }
+
+                Fragment fragment = new OpinionesExcursionFragment();
+                Bundle args = new Bundle();
+                args.putSerializable(OpinionesExcursionFragment.ARG_RESULTADO_BUSQUEDA, arrExcursiones);
+                args.putSerializable(OpinionesExcursionFragment.ARG_OPINIONES, opiniones);
+                fragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            } else {
+                // NO hay resultado de búsqueda
+                Log.i("OPINIONES_EXCURSION", "La excursión NO tiene opiniones");
+
+                ArrayList<Excursion> opiniones = new ArrayList<Excursion>();
+
+                Fragment fragment = new OpinionesExcursionFragment();
+                Bundle args = new Bundle();
+                args.putSerializable(OpinionesExcursionFragment.ARG_RESULTADO_BUSQUEDA, arrExcursiones);
+                args.putSerializable(OpinionesExcursionFragment.ARG_OPINIONES, opiniones);
+                fragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            }
+
+            firstTime = false;
+
+            progressDialog.dismiss();
         }
     }
 }

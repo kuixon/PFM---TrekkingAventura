@@ -226,6 +226,7 @@ public class BuscarExcursionesFragment extends Fragment {
                 Log.i("EXCURSIONES_BUSQUEDA", "Hay resultado de búsqueda");
                 ArrayList<Excursion> arrExcursiones = new ArrayList<Excursion>();
                 for (ExcursionDB e : ale) {
+
                     arrExcursiones.add(new Excursion(e.getIdExcursion(), e.getNombre(), "", e.getNivel(),
                             e.getDistancia(), e.getLugar(), e.getLatitud(), e.getLongitud(), e.getFoto()));
                 }

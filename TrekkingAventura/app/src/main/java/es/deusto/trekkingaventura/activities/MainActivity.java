@@ -39,6 +39,7 @@ import es.deusto.trekkingaventura.fragments.AjustesFragment;
 import es.deusto.trekkingaventura.fragments.FormExcursionesFragment;
 import es.deusto.trekkingaventura.fragments.MisExcursionesFragment;
 import es.deusto.trekkingaventura.entities.DrawerItem;
+import es.deusto.trekkingaventura.fragments.ResultadoBusquedaFragment;
 import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
 import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
 import es.deusto.trekkingaventura.utilities.InternetAlarmManager;
@@ -215,6 +216,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void selectItem(int position) {
+
+        if (!appFirstTimeOpened && ResultadoBusquedaFragment.firstTime) {
+            ResultadoBusquedaFragment.firstTime = false;
+        }
 
         // Declaramos el fragment.
         Fragment fragment;
