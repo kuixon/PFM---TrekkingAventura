@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.ExcursionDestacada;
 import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entitiesDB.ExcursionDB;
@@ -85,5 +86,33 @@ public class RestJSONParserManager {
         }
 
         return aled;
+    }
+
+    public static ArrayList<ExcursionDB> getExcursionesBusqueda(String data) throws JSONException {
+        ArrayList<ExcursionDB> ale = new ArrayList<ExcursionDB>();
+
+        JSONObject root = new JSONObject(data);
+        JSONArray excursiones = root.getJSONArray("excursion");
+
+        ExcursionDB e;
+        JSONObject excursion;
+        for (int i = 0; i < excursiones.length(); i++) {
+            e = new ExcursionDB();
+
+            excursion = excursiones.getJSONObject(i);
+
+            e.setIdExcursion(excursion.getInt("idExcursion"));
+            e.setNombre(excursion.getString("nombre"));
+            e.setNivel(excursion.getString("nivel"));
+            e.setLugar(excursion.getString("lugar"));
+            e.setDistancia(excursion.getDouble("distancia"));
+            e.setFoto(excursion.getString("foto"));
+            e.setLatitud(Float.parseFloat(excursion.getString("latitud")));
+            e.setLongitud(Float.parseFloat(excursion.getString("longitud")));
+
+            ale.add(e);
+        }
+
+        return ale;
     }
 }

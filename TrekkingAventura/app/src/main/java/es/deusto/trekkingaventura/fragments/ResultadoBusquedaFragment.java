@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -54,15 +57,6 @@ public class ResultadoBusquedaFragment extends Fragment {
         listExcursiones = (ListView) rootView.findViewById(R.id.listResultadoBusqueda);
         arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_RESULTADO_BUSQUEDA);
 
-        Log.i("ARR__BANNERS_RESULTADO", "Excursiones dentro del array:");
-        for (Excursion e :arrExcursiones) {
-            if (e != null) {
-                Log.i("ARR_EXCURSIONES_BANNERS", "Nombre excursión: " + e.getName());
-            } else {
-                Log.i("ARR_EXCURSIONES_BANNERS", "Banner");
-            }
-        }
-
         // Inicializamos el list adapter personalizado y le cambiamos el adaptador a la lista por
         // el inicializado.
         adpExcursiones = new ExcursionListAdapter(getContext(), R.layout.excursion_list_adapter, arrExcursiones);
@@ -103,5 +97,27 @@ public class ResultadoBusquedaFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.opiniones_excursiones, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.mnu_back) {
+            Fragment fragment = new BuscarExcursionesFragment();
+            Bundle args = new Bundle();
+            args.putInt(BuscarExcursionesFragment.ARG_BUSCAR_EXCURSIONES_NUMBER, 1);
+            fragment.setArguments(args);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 }

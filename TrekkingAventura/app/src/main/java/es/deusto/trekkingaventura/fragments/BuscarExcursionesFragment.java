@@ -14,16 +14,15 @@ import android.widget.RadioGroup;
 
 import org.json.JSONException;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Random;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.ExcursionDestacada;
+import es.deusto.trekkingaventura.entitiesDB.ExcursionDB;
 import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
 import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
 
@@ -84,17 +83,24 @@ public class BuscarExcursionesFragment extends Fragment {
     }
 
     public void find(View v) {
-        // En este punto se realizaría la búsqueda y se le pasarían al fragment ResultadoBusqueda
-        // todas las excursiones resultantes.
+        String nombre = edtName.getText().toString().equals("") ? "nulo" : edtName.getText().toString();
+        String lugar = edtLocation.getText().toString().equals("") ? "nulo" : edtLocation.getText().toString();
+        String distancia = edtDistance.getText().toString().equals("") ? "nulo" : edtDistance.getText().toString();;
+        String nivel = "nulo";
+        switch (rdgLevel.getCheckedRadioButtonId()) {
+            case R.id.b_level_low:
+                nivel = "Facil";
+                break;
+            case R.id.b_level_medium:
+                nivel = "Medio";
+                break;
+            case R.id.b_level_high:
+                nivel = "Dificil";
+                break;
+        }
 
-        // INICIO - Búsqueda provisional donde el resulado serían las 4 excursiones de prueba
-        Fragment fragment = new ResultadoBusquedaFragment();
-        Bundle args = new Bundle();
-        args.putString(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA_TITLE, "Resultado de la búsqueda");
-        args.putSerializable(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA, arrExcursionesBusqueda);
-        fragment.setArguments(args);
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
-        // INICIO - Búsqueda provisional donde el resulado serían las 4 excursiones de prueba
+        BuscarExcursionesTask task = new BuscarExcursionesTask();
+        task.execute(new String[] {nombre, lugar, distancia, nivel});
     }
 
     private class InicializarExcursionesBusquedaTask extends AsyncTask<Void, Void, ArrayList<ExcursionDestacada>> {
@@ -175,6 +181,70 @@ public class BuscarExcursionesFragment extends Fragment {
                 Fragment fragment = new ResultadoBusquedaFragment();
                 Bundle args = new Bundle();
                 args.putString(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA_TITLE, "Excursiones destacadas");
+                args.putSerializable(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA, arrExcursionesBusqueda);
+                fragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            }
+
+            progressDialog.dismiss();
+        }
+    }
+
+    private class BuscarExcursionesTask extends AsyncTask<String, Void, ArrayList<ExcursionDB>> {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Buscando excursiones...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<ExcursionDB> doInBackground(String... params) {
+            ArrayList<ExcursionDB> ale = null;
+
+            String data = (new RestClientManager()).buscarExcursionesPorCriterio(params[0], params[1], params[2], params[3]);
+            if (data != null) {
+                try {
+                    ale = RestJSONParserManager.getExcursionesBusqueda(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return ale;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<ExcursionDB> ale) {
+            super.onPostExecute(ale);
+            if (ale != null) {
+                // Hay resultado de búsqueda
+                Log.i("EXCURSIONES_BUSQUEDA", "Hay resultado de búsqueda");
+                ArrayList<Excursion> arrExcursiones = new ArrayList<Excursion>();
+                for (ExcursionDB e : ale) {
+                    arrExcursiones.add(new Excursion(e.getIdExcursion(), e.getNombre(), "", e.getNivel(),
+                            e.getDistancia(), e.getLugar(), e.getLatitud(), e.getLongitud(), e.getFoto()));
+                }
+
+                Fragment fragment = new ResultadoBusquedaFragment();
+                Bundle args = new Bundle();
+                args.putString(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA_TITLE, "Resultado de la búsqueda");
+                args.putSerializable(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA, arrExcursiones);
+                fragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            } else {
+                // NO hay resultado de búsqueda
+                Log.i("EXCURSIONES_BUSQUEDA", "NO hay resultado de búsqueda");
+
+                arrExcursionesBusqueda = new ArrayList<Excursion>();
+
+                Fragment fragment = new ResultadoBusquedaFragment();
+                Bundle args = new Bundle();
+                args.putString(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA_TITLE, "Resultado de la búsqueda");
                 args.putSerializable(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA, arrExcursionesBusqueda);
                 fragment.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
