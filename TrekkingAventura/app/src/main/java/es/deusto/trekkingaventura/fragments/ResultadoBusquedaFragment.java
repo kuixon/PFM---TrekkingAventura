@@ -92,33 +92,6 @@ public class ResultadoBusquedaFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        if (!firstTime) {
-            inflater.inflate(R.menu.opiniones_excursiones, menu);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.mnu_back) {
-            Fragment fragment = new BuscarExcursionesFragment();
-            Bundle args = new Bundle();
-            args.putInt(BuscarExcursionesFragment.ARG_BUSCAR_EXCURSIONES_NUMBER, 1);
-            fragment.setArguments(args);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-            firstTime = false;
-
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
     private class InicializarOpinionesTask extends AsyncTask<Excursion, Void, ArrayList<OpinionDB>> {
         String nombreExcursion = "";
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -181,8 +154,6 @@ public class ResultadoBusquedaFragment extends Fragment {
                 fragment.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
-
-            firstTime = false;
 
             progressDialog.dismiss();
         }

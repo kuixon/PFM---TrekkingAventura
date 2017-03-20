@@ -76,7 +76,11 @@ public class OpinionesExcursionFragment extends Fragment {
         if (id == R.id.mnu_back) {
             Fragment fragment = new ResultadoBusquedaFragment();
             Bundle args = new Bundle();
-            args.putString(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA_TITLE, "Resultado de la búsqueda");
+            if (ResultadoBusquedaFragment.firstTime) {
+                args.putString(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA_TITLE, "Excursiones destacadas");
+            } else {
+                args.putString(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA_TITLE, "Resultado de la búsqueda");
+            }
             args.putSerializable(ResultadoBusquedaFragment.ARG_RESULTADO_BUSQUEDA, arrExcursiones);
             fragment.setArguments(args);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
