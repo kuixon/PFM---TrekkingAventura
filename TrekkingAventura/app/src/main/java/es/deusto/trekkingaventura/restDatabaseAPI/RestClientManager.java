@@ -98,6 +98,44 @@ public class RestClientManager {
         return null;
     }
 
+    // EXCURSIONES
+    public static String obtenerExcursionesDestacadas() {
+        BufferedReader br = null;
+
+        URL url;
+        try {
+            url = new URL("http://www.trekkingaventura-160709.appspot.com/rest/8JTFVFQX/excursiones/destacadas");
+
+            URLConnection connection = url.openConnection();
+
+            // Let's read the response
+            br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+
+            while((line = br.readLine()) != null) {
+                sb.append(line);
+                sb.append(System.getProperty("line.separator"));
+            }
+
+            return sb.toString();
+        } catch(MalformedURLException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
     // OPINIONES
     public static String obtenerOpinionesUsuario(String idUsuario) {
         BufferedReader br = null;

@@ -239,7 +239,6 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 fragment = new BuscarExcursionesFragment();
                 args.putInt(BuscarExcursionesFragment.ARG_BUSCAR_EXCURSIONES_NUMBER, position);
-                args.putSerializable(BuscarExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
                 fragment.setArguments(args);
                 break;
             case 2:

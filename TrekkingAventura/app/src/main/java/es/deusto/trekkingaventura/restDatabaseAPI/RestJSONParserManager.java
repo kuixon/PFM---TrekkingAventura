@@ -5,8 +5,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import es.deusto.trekkingaventura.entities.ExcursionDestacada;
 import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entitiesDB.ExcursionDB;
 import es.deusto.trekkingaventura.entitiesDB.UsuarioDB;
@@ -56,5 +56,34 @@ public class RestJSONParserManager {
         }
 
         return loe;
+    }
+
+    public static ArrayList<ExcursionDestacada> getExcursionesDestacadas(String data) throws JSONException {
+        ArrayList<ExcursionDestacada> aled = new ArrayList<ExcursionDestacada>();
+
+        JSONObject root = new JSONObject(data);
+        JSONArray excursionesDestacadas = root.getJSONArray("excursionDestacada");
+
+        ExcursionDestacada ed;
+        JSONObject excursionDestacada;
+        for (int i=0; i < excursionesDestacadas.length(); i++) {
+            ed = new ExcursionDestacada();
+
+            excursionDestacada = excursionesDestacadas.getJSONObject(i);
+
+            ed.setIdExcursion(excursionDestacada.getInt("idExcursion"));
+            ed.setNombre(excursionDestacada.getString("nombre"));
+            ed.setNivel(excursionDestacada.getString("nivel"));
+            ed.setLugar(excursionDestacada.getString("lugar"));
+            ed.setDistancia(excursionDestacada.getDouble("distancia"));
+            ed.setFoto(excursionDestacada.getString("foto"));
+            ed.setLatitud(Float.parseFloat(excursionDestacada.getString("latitud")));
+            ed.setLongitud(Float.parseFloat(excursionDestacada.getString("longitud")));
+            ed.setNumOpiniones(excursionDestacada.getInt("numOpiniones"));
+
+            aled.add(ed);
+        }
+
+        return aled;
     }
 }
