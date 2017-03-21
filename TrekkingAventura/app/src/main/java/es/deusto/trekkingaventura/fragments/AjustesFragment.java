@@ -49,7 +49,7 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
 
         for (int i = 0; i < arrExcursiones.size(); i++) {
             entries[i] = arrExcursiones.get(i).getName();
-            entryValues[i] = Integer.toString(arrExcursiones.get(i).getId());
+            entryValues[i] = Integer.toString(arrExcursiones.get(i).getIdExcursion());
         }
 
         ListPreference listExcursiones = (ListPreference) this.findPreference("excursiones");
@@ -123,7 +123,7 @@ public class AjustesFragment extends PreferenceFragment implements SharedPrefere
 
     private Excursion getExcursionById(int id) {
         for (Excursion e : arrExcursiones) {
-            if (e.getId() == id) {
+            if (e.getIdExcursion() == id) {
                 return e;
             }
         }

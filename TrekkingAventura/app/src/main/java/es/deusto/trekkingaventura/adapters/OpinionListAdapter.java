@@ -47,7 +47,7 @@ public class OpinionListAdapter extends ArrayAdapter<Excursion> {
             if(opinion.getImgPath() == null || opinion.getImgPath().isEmpty()) {
                 imageExcursion.setImageResource(R.drawable.imgnotavailable);
             } else {
-                PicassoClient.downloadImage(getContext(), opinion.getImgPath(), imageExcursion);
+                PicassoClient.downloadImage(getContext(), "http://res.cloudinary.com/trekkingaventura/image/upload/" + opinion.getImgPath(), imageExcursion);
             }
 
             txtOpinion.setText(opinion.getOpinion());

@@ -34,12 +34,16 @@ import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.adapters.ExcursionListAdapter;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.entities.OpinionExtendida;
 
 public class MisExcursionesFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
 
     public static final String ARG_MIS_EXCURSIONES_NUMBER = "mis_excursiones_number";
     public static final String ARG_MIS_EXCURSIONES = "mis_excursiones";
+    public static final String ARG_MIS_OPINIONES_EXTENDIDAS = "mis_opiniones_extendidas";
+
+    private ArrayList<OpinionExtendida> arrOpinionesExtendidas;
 
     private ListView listExcursiones;
     private ArrayList<Excursion> arrExcursiones;
@@ -71,6 +75,8 @@ public class MisExcursionesFragment extends Fragment implements GoogleApiClient.
         // Ponemos esta opción a true para poder inflar el menu en la Toolbar.
         setHasOptionsMenu(true);
 
+        arrOpinionesExtendidas = (ArrayList<OpinionExtendida>) getArguments().getSerializable(ARG_MIS_OPINIONES_EXTENDIDAS);
+
         // Obtenemos la lista de excursiones del layout y la inicializamos.
         listExcursiones = (ListView) rootView.findViewById(R.id.listExcursiones);
         arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_MIS_EXCURSIONES);
@@ -91,6 +97,7 @@ public class MisExcursionesFragment extends Fragment implements GoogleApiClient.
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Fragment fragment = new ExcursionFragment();
                 Bundle args = new Bundle();
+                args.putSerializable(ExcursionFragment.ARG_OPINIONES_EXTENDIDAS, arrOpinionesExtendidas);
                 args.putSerializable(ExcursionFragment.ARG_EXCURSIONES, arrExcursionesFiltered);
                 args.putSerializable(ExcursionFragment.EXCURSION_KEY, arrExcursionesFiltered.get(position));
                 fragment.setArguments(args);

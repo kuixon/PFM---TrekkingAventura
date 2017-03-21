@@ -4,7 +4,8 @@ import java.io.Serializable;
 
 public class Excursion implements Serializable{
 
-    private int id;
+    private int idOpinion;
+    private int idExcursion;
     private String name;
     private String opinion;
     private String level;
@@ -18,8 +19,9 @@ public class Excursion implements Serializable{
 
     }
 
-    public Excursion(int id, String name, String opinion, String level, double travelDistance, String location, float latitude, float longitude, String imgPath) {
-        this.id = id;
+    public Excursion(int idOpinion, int idExcursion, String name, String opinion, String level, double travelDistance, String location, float latitude, float longitude, String imgPath) {
+        this.idOpinion = idOpinion;
+        this.idExcursion = idExcursion;
         this.name = name;
         this.opinion = opinion;
         this.level = level;
@@ -30,12 +32,20 @@ public class Excursion implements Serializable{
         this.imgPath = imgPath;
     }
 
-    public int getId() {
-        return id;
+    public int getIdOpinion() {
+        return idOpinion;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdOpinion(int idOpinion) {
+        this.idOpinion = idOpinion;
+    }
+
+    public int getIdExcursion() {
+        return idExcursion;
+    }
+
+    public void setIdExcursion(int idExcursion) {
+        this.idExcursion = idExcursion;
     }
 
     public String getName() {
@@ -105,7 +115,8 @@ public class Excursion implements Serializable{
     @Override
     public String toString() {
         return "Excursion{" +
-                "id=" + id +
+                "idOpinion=" + idOpinion +
+                ", idExcursion=" + idExcursion +
                 ", name='" + name + '\'' +
                 ", opinion='" + opinion + '\'' +
                 ", level='" + level + '\'' +

@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment = new FormExcursionesFragment();
                 Bundle args = new Bundle();
                 args.putSerializable(FormExcursionesFragment.FORM_EXCURSION_KEY, null);
+                args.putSerializable(FormExcursionesFragment.FORM_OPINIONES_EXTENDIDAS, arrOpinionesExtendidas);
                 args.putSerializable(FormExcursionesFragment.FORM_EXCURSIONES, arrExcursiones);
                 args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES_TITLE, "Formulario");
                 args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES_SOURCE, "Mis Excursiones");
@@ -238,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 fragment = new MisExcursionesFragment();
                 args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, position);
+                args.putSerializable(MisExcursionesFragment.ARG_MIS_OPINIONES_EXTENDIDAS, arrOpinionesExtendidas);
                 args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
                 fragment.setArguments(args);
                 break;
@@ -434,10 +436,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("EXCURSIONES", "El usuario '" + usuario.getIdUsuario() + "' tiene excursiones");
                 arrExcursiones = new ArrayList<Excursion>();
                 for (OpinionExtendida oe : aloe) {
-                    arrExcursiones.add(new Excursion(oe.getExcursion().getIdExcursion(), oe.getExcursion().getNombre(),
-                            oe.getOpinion(), oe.getExcursion().getNivel(), oe.getExcursion().getDistancia(),
-                            oe.getExcursion().getLugar(), oe.getExcursion().getLatitud(), oe.getExcursion().getLongitud(),
-                            oe.getImgPath()));
+                    arrExcursiones.add(new Excursion(oe.getIdOpinion(), oe.getExcursion().getIdExcursion(),
+                            oe.getExcursion().getNombre(), oe.getOpinion(), oe.getExcursion().getNivel(),
+                            oe.getExcursion().getDistancia(), oe.getExcursion().getLugar(), oe.getExcursion().getLatitud(),
+                            oe.getExcursion().getLongitud(), oe.getImgPath()));
                 }
                 arrOpinionesExtendidas = aloe;
             } else {

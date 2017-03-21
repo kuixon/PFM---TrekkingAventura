@@ -31,6 +31,7 @@ import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entities.Weather;
 import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
 import es.deusto.trekkingaventura.imagesAPI.PicassoClient;
@@ -45,8 +46,10 @@ public class ExcursionFragment extends Fragment {
 
     public static final String EXCURSION_KEY = "excursion_key";
     public static final String ARG_EXCURSIONES = "excursiones";
+    public static final String ARG_OPINIONES_EXTENDIDAS = "opiniones_extendidas";
 
     private ArrayList<Excursion> arrExcursiones;
+    private ArrayList<OpinionExtendida> arrOpinionesExtendidas;
     private Excursion excursion;
 
     private ImageView imgExc;
@@ -80,6 +83,7 @@ public class ExcursionFragment extends Fragment {
         // Obtenemos el nombre del elemento de la lista seleccionado.
         View rootView = inflater.inflate(R.layout.fragment_excursion, container, false);
 
+        arrOpinionesExtendidas = (ArrayList<OpinionExtendida>) getArguments().getSerializable(ARG_OPINIONES_EXTENDIDAS);
         arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(ARG_EXCURSIONES);
         excursion = (Excursion) getArguments().getSerializable(EXCURSION_KEY);
 
@@ -114,7 +118,7 @@ public class ExcursionFragment extends Fragment {
         if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty()) {
             imgExc.setImageResource(R.drawable.imgnotavailable);
         } else {
-            PicassoClient.downloadImage(getContext(), excursion.getImgPath(), imgExc);
+            PicassoClient.downloadImage(getContext(), "http://res.cloudinary.com/trekkingaventura/image/upload/" + excursion.getImgPath(), imgExc);
         }
 
         txtName.setText(excursion.getName());
@@ -175,6 +179,7 @@ public class ExcursionFragment extends Fragment {
             args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES_TITLE, "Formulario");
             args.putString(FormExcursionesFragment.ARG_FORM_EXCURSIONES_SOURCE, "Excursion");
             args.putSerializable(FormExcursionesFragment.FORM_EXCURSION_KEY, excursion);
+            args.putSerializable(FormExcursionesFragment.FORM_OPINIONES_EXTENDIDAS, arrOpinionesExtendidas);
             args.putSerializable(FormExcursionesFragment.FORM_EXCURSIONES, arrExcursiones);
             fragment.setArguments(args);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();

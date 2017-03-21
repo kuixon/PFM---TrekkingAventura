@@ -2,6 +2,7 @@ package es.deusto.trekkingaventura.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -35,16 +36,25 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.entities.OpinionExtendida;
+import es.deusto.trekkingaventura.entitiesDB.OpinionDB;
 import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
 import es.deusto.trekkingaventura.utilities.ImageHelper;
 
 import static android.app.Activity.RESULT_OK;
@@ -62,10 +72,13 @@ public class FormExcursionesFragment extends Fragment implements
     public static final String ARG_FORM_EXCURSIONES_SOURCE = "form_excursiones_source";
     public static final String FORM_EXCURSION_KEY = "form_excursion_key";
     public static final String FORM_EXCURSIONES = "form_excursiones";
+    public static final String FORM_OPINIONES_EXTENDIDAS = "form_opiniones_extendidas";
     public static final int IMG_FROM_CAMERA = 1;
     public static final int IMG_FROM_GALLERY = 2;
 
     private GoogleApiClient mGoogleApiClient;
+
+    private ArrayList<OpinionExtendida> arrOpinionesExtendidas;
 
     private ArrayList<Excursion> arrExcursiones;
     private Excursion excursion;
@@ -116,6 +129,7 @@ public class FormExcursionesFragment extends Fragment implements
         // Ponemos esta opción a true para poder inflar el menu en la Toolbar.
         setHasOptionsMenu(true);
 
+        arrOpinionesExtendidas = (ArrayList<OpinionExtendida>) getArguments().getSerializable(FORM_OPINIONES_EXTENDIDAS);
         arrExcursiones = (ArrayList<Excursion>) getArguments().getSerializable(FORM_EXCURSIONES);
 
         inputLayoutName = (TextInputLayout) rootView.findViewById(R.id.input_layout_name);
@@ -234,8 +248,6 @@ public class FormExcursionesFragment extends Fragment implements
 
             return true;
         } else if (id == R.id.mnu_create_exc) {
-            // En este punto, se tendría que crear/editar la excursión y almacenarla en la BDD del servidor. Por el momento,
-            // añadimos/editamos la excursión y la cambiamos en memoria.
             if (validateFields()) {
                 // Todo está bien validado
                 excursion.setName(edtName.getText().toString());
@@ -259,21 +271,13 @@ public class FormExcursionesFragment extends Fragment implements
                 excursion.setLongitude(Float.parseFloat(edtLongitude.getText().toString().trim()));
 
                 if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty() && localImagePath) {
-                    // Subimos la imagen al servidor de Cloudinary.
-                    // El formato del nombre de la imagen seria: 'idUsuario_idExcursion_idOpinion'
-                    // Habría que meter los datos correctamente para que no pudiese haber dos imágenes
-                    // con el mismo nombre en el servidor (lo del idOpinion lo ponemos así para los datos
-                    // de prueba, luego habría que ponerlo bien).
-                    UploadImageTask task = new UploadImageTask();
-                    task.execute(new String[]{excursion.getImgPath(), MainActivity.usuario.getIdUsuario() + "_"
-                            + Long.toString(excursion.getId()) + "_"
-                            + Long.toString(arrExcursiones.size()+1)});
+                    DateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+                    Date date = new Date();
 
-                    // Actualizamos el path de la excursión (esto también habría que hacerlo en BD)
-                    excursion.setImgPath("http://res.cloudinary.com/trekkingaventura/image/upload/"
-                            + MainActivity.usuario.getIdUsuario() + "_"
-                            + Long.toString(excursion.getId()) + "_"
-                            + Long.toString(arrExcursiones.size()+1) + ".jpg");
+                    UploadImageTask task = new UploadImageTask();
+                    task.execute(new String[]{excursion.getImgPath(), "img_" + dateFormat.format(date)});
+
+                    excursion.setImgPath("img_" + dateFormat.format(date) + ".jpg");
                 } else {
                     if (txtImage.getText().toString().equals("")) {
                         excursion.setImgPath("");
@@ -281,9 +285,8 @@ public class FormExcursionesFragment extends Fragment implements
                 }
 
                 if (editar) {
-                    // Estamos editando un excursión existente
                     for (Excursion e : arrExcursiones) {
-                        if (e.getId() == excursion.getId()) {
+                        if (e.getIdOpinion() == excursion.getIdOpinion()) {
                             e.setName(excursion.getName());
                             e.setOpinion(excursion.getOpinion());
                             e.setLocation(excursion.getLocation());
@@ -295,6 +298,12 @@ public class FormExcursionesFragment extends Fragment implements
                             break;
                         }
                     }
+
+                    OpinionDB opinion = new OpinionDB(excursion.getIdOpinion(), MainActivity.usuario.getIdUsuario(),
+                            excursion.getIdExcursion(), excursion.getOpinion(), excursion.getImgPath());
+
+                    EditarOpinionTask task = new EditarOpinionTask();
+                    task.execute(new OpinionDB[] {opinion});
                 } else {
                     // Estamos creando una nueva excursión
                     arrExcursiones.add(excursion);
@@ -705,6 +714,40 @@ public class FormExcursionesFragment extends Fragment implements
         protected Void doInBackground(String... params) {
             CloudinaryClient.uploadImage(params[0], params[1]);
             return null;
+        }
+    }
+
+    private class EditarOpinionTask extends AsyncTask<OpinionDB, Void, Void> {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Editando excursión...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(OpinionDB... params) {
+            String data = (new RestClientManager()).editarOpinion(params[0]);
+            if (data != null) {
+                // Se ha editado correctamente
+                Log.i("EDITAR_OPINIÓN", "Se ha editado la opinión correctamente");
+            } else {
+                // No se ha editado la opinión
+                Log.i("EDITAR_OPINIÓN", "NO se ha podido editar la opinión");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            progressDialog.dismiss();
         }
     }
 }

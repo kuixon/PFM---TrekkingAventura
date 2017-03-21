@@ -150,7 +150,7 @@ public class BuscarExcursionesFragment extends Fragment {
                 int aux = 1;
                 for (ExcursionDestacada ed : aled) {
                     if (ed.getNumOpiniones() == posiciones[posiciones.length - aux]) {
-                        arrExcursionesBusqueda.add(new Excursion(ed.getIdExcursion(), ed.getNombre(), "",
+                        arrExcursionesBusqueda.add(new Excursion(0, ed.getIdExcursion(), ed.getNombre(), "",
                                 ed.getNivel(), ed.getDistancia(), ed.getLugar(), ed.getLatitud(), ed.getLongitud(), ed.getFoto()));
                         aux++;
 
@@ -161,8 +161,8 @@ public class BuscarExcursionesFragment extends Fragment {
                 }
 
                 ArrayList<Excursion> arrExcursionesBanner = new ArrayList<Excursion>(arrExcursionesBusqueda);
-                arrExcursionesBanner.add(new Excursion(-100,"Banner Ropa", "", "", 0,"",0,0,"Banner Ropa"));
-                arrExcursionesBanner.add(new Excursion(-100,"Banner Transporte", "", "", 0,"",0,0,"Banner Transporte"));
+                arrExcursionesBanner.add(new Excursion(0, -100,"Banner Ropa", "", "", 0,"",0,0,"Banner Ropa"));
+                arrExcursionesBanner.add(new Excursion(0, -100,"Banner Transporte", "", "", 0,"",0,0,"Banner Transporte"));
                 Collections.shuffle(arrExcursionesBanner);
 
                 Fragment fragment = new ResultadoBusquedaFragment();
@@ -227,7 +227,7 @@ public class BuscarExcursionesFragment extends Fragment {
                 ArrayList<Excursion> arrExcursiones = new ArrayList<Excursion>();
                 for (ExcursionDB e : ale) {
 
-                    arrExcursiones.add(new Excursion(e.getIdExcursion(), e.getNombre(), "", e.getNivel(),
+                    arrExcursiones.add(new Excursion(0, e.getIdExcursion(), e.getNombre(), "", e.getNivel(),
                             e.getDistancia(), e.getLugar(), e.getLatitud(), e.getLongitud(), e.getFoto()));
                 }
 

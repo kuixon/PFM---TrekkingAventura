@@ -48,7 +48,7 @@ public class ExcursionListAdapter extends ArrayAdapter<Excursion> {
                 } else if (excursion.getImgPath().equals("Banner Transporte")) {
                     imageExcursion.setImageResource(R.drawable.banner_transporte);
                 } else {
-                    PicassoClient.downloadImage(getContext(), excursion.getImgPath(), imageExcursion);
+                    PicassoClient.downloadImage(getContext(), "http://res.cloudinary.com/trekkingaventura/image/upload/" + excursion.getImgPath(), imageExcursion);
                 }
             }
 

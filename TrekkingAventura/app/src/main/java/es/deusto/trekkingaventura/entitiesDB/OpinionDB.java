@@ -18,6 +18,14 @@ public class OpinionDB implements Serializable {
 
     }
 
+    public OpinionDB(int idOpinion, String idUsuario, int idExcursion, String opinion, String foto) {
+        this.idOpinion = idOpinion;
+        this.idUsuario = idUsuario;
+        this.idExcursion = idExcursion;
+        this.opinion = opinion;
+        this.foto = foto;
+    }
+
     public OpinionDB(String idUsuario, int idExcursion, String opinion, String foto) {
         this.idUsuario = idUsuario;
         this.idExcursion = idExcursion;

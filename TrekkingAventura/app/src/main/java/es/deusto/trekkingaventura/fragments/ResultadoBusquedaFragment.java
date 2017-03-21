@@ -111,7 +111,7 @@ public class ResultadoBusquedaFragment extends Fragment {
 
             ArrayList<OpinionDB> alo = null;
 
-            String data = (new RestClientManager()).obtenerOpinionesPorIdExcursion(params[0].getId());
+            String data = (new RestClientManager()).obtenerOpinionesPorIdExcursion(params[0].getIdExcursion());
             if (data != null) {
                 try {
                     alo = RestJSONParserManager.getOpinionesPorIdExcursion(data);
@@ -132,7 +132,7 @@ public class ResultadoBusquedaFragment extends Fragment {
 
                 ArrayList<Excursion> opiniones = new ArrayList<Excursion>();
                 for (OpinionDB o : alo) {
-                    opiniones.add(new Excursion(o.getIdExcursion(), nombreExcursion, o.getOpinion(), "", 0, "", 0f, 0f, o.getFoto()));
+                    opiniones.add(new Excursion(o.getIdOpinion(), o.getIdExcursion(), nombreExcursion, o.getOpinion(), "", 0, "", 0f, 0f, o.getFoto()));
                 }
 
                 Fragment fragment = new OpinionesExcursionFragment();

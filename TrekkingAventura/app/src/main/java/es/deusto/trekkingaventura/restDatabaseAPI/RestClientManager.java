@@ -15,6 +15,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import es.deusto.trekkingaventura.entitiesDB.OpinionDB;
 import es.deusto.trekkingaventura.entitiesDB.UsuarioDB;
 
 /**
@@ -218,6 +219,48 @@ public class RestClientManager {
         URL url;
         try {
             url = new URL("http://www.trekkingaventura-160709.appspot.com/rest/8JTFVFQX/opiniones/excursion/" + idExcursion);
+
+            URLConnection connection = url.openConnection();
+
+            // Let's read the response
+            br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+
+            while((line = br.readLine()) != null) {
+                sb.append(line);
+                sb.append(System.getProperty("line.separator"));
+            }
+
+            return sb.toString();
+        } catch(MalformedURLException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public static String editarOpinion(OpinionDB opinion) {
+        BufferedReader br = null;
+
+        URL url;
+        try {
+            final String op = opinion.getOpinion().replace(" ", "%20");
+
+            url = new URL("http://www.trekkingaventura-160709.appspot.com/rest/8JTFVFQX/opiniones/editar/" +
+                    "idopinion=" + opinion.getIdOpinion() + "&idusuario=" + opinion.getIdUsuario() +
+                    "&idexcursion=" + opinion.getIdExcursion() + "&opinion=" + op +
+                    "&imgpath=" + opinion.getFoto());
 
             URLConnection connection = url.openConnection();
 

@@ -29,6 +29,20 @@ public class RestJSONParserManager {
         return usuario;
     }
 
+    public static OpinionDB getOpinionDB(String data) throws JSONException {
+        OpinionDB opinion = new OpinionDB();
+
+        JSONObject jObj = new JSONObject(data);
+
+        opinion.setIdOpinion(jObj.getInt("idOpinion"));
+        opinion.setIdUsuario(jObj.getString("idUsuario"));
+        opinion.setIdExcursion(jObj.getInt("idExcursion"));
+        opinion.setOpinion(jObj.getString("opinion"));
+        opinion.setFoto(jObj.getString("foto"));
+
+        return opinion;
+    }
+
     public static ArrayList<OpinionExtendida> getOpinionesExtendidas(String data) throws JSONException {
         ArrayList<OpinionExtendida> loe = new ArrayList<OpinionExtendida>();
 
