@@ -1,5 +1,6 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,11 +31,14 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
+import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entities.Weather;
 import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
 import es.deusto.trekkingaventura.imagesAPI.PicassoClient;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
 import es.deusto.trekkingaventura.weatherAPI.JSONWeatherParser;
 import es.deusto.trekkingaventura.weatherAPI.WeatherHttpClient;
 
@@ -185,24 +189,8 @@ public class ExcursionFragment extends Fragment {
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             return true;
         } else if (id == R.id.mnu_delete_exc) {
-
-            // Se elimina en este punto la excursión en cuestión. Habría que eliminarla de la BD.
-
-            Toast.makeText(getContext(), "La excursión '" + excursion.getName() + "' ha sido eliminada.", Toast.LENGTH_SHORT).show();
-
-            for (Excursion e : arrExcursiones) {
-                if (e.getName().equals(excursion.getName())) {
-                    arrExcursiones.remove(e);
-                    break;
-                }
-            }
-
-            Fragment fragment = new MisExcursionesFragment();
-            Bundle args = new Bundle();
-            args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
-            args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
-            fragment.setArguments(args);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            EliminarOpinionTask task = new EliminarOpinionTask();
+            task.execute(new String[] {Integer.toString(excursion.getIdOpinion())});
             return true;
         } else {
             return super.onOptionsItemSelected(item);
@@ -314,6 +302,102 @@ public class ExcursionFragment extends Fragment {
             } else {
                 panelTiempoNoDisponible.setVisibility(View.VISIBLE);
             }
+        }
+    }
+
+    private class EliminarOpinionTask extends AsyncTask<String, Void, Void> {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Eliminando excursión...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            String data = (new RestClientManager()).eliminarOpinion(Integer.parseInt(params[0]));
+            if (data != null) {
+                // Se ha eliminado correctamente
+                Log.i("ELIMINAR_OPINIÓN", "Se ha eliminado la opinión correctamente");
+            } else {
+                // No se ha eliminado la opinión
+                Log.i("ELIMINAR_OPINIÓN", "NO se ha podido eliminar la opinión");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            InicializarExcursionesTask task = new InicializarExcursionesTask();
+            task.execute(new String[] {MainActivity.usuario.getIdUsuario()});
+
+            progressDialog.dismiss();
+        }
+    }
+
+    private class InicializarExcursionesTask extends AsyncTask<String, Void, ArrayList<OpinionExtendida>> {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Cargando excursiones del usuario...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<OpinionExtendida> doInBackground(String... params) {
+            ArrayList<OpinionExtendida> aloe = null;
+
+            String data = ((new RestClientManager()).obtenerOpinionesUsuario(params[0]));
+            if (data != null) {
+                try {
+                    aloe = RestJSONParserManager.getOpinionesExtendidas(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return aloe;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<OpinionExtendida> aloe) {
+            super.onPostExecute(aloe);
+            if (aloe != null) {
+                // El usuario tiene excursiones
+                arrExcursiones = new ArrayList<Excursion>();
+                for (OpinionExtendida oe : aloe) {
+                    arrExcursiones.add(new Excursion(oe.getIdOpinion(), oe.getExcursion().getIdExcursion(),
+                            oe.getExcursion().getNombre(), oe.getOpinion(), oe.getExcursion().getNivel(),
+                            oe.getExcursion().getDistancia(), oe.getExcursion().getLugar(), oe.getExcursion().getLatitud(),
+                            oe.getExcursion().getLongitud(), oe.getImgPath()));
+                }
+                arrOpinionesExtendidas = aloe;
+            } else {
+                // El usuario no tiene excursiones
+                arrExcursiones = new ArrayList<Excursion>();
+                arrOpinionesExtendidas = new ArrayList<OpinionExtendida>();
+            }
+
+            Fragment fragment = new MisExcursionesFragment();
+            Bundle args = new Bundle();
+            args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
+            args.putSerializable(MisExcursionesFragment.ARG_MIS_OPINIONES_EXTENDIDAS, arrOpinionesExtendidas);
+            args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
+            fragment.setArguments(args);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+            progressDialog.dismiss();
         }
     }
 }
