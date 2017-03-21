@@ -1,11 +1,13 @@
 package es.deusto.trekkingaventura.widget;
 
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -16,7 +18,10 @@ import java.util.ArrayList;
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entities.Weather;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
 import es.deusto.trekkingaventura.weatherAPI.JSONWeatherParser;
 import es.deusto.trekkingaventura.weatherAPI.WeatherHttpClient;
 
@@ -42,24 +47,8 @@ public class ExcursionWidget extends AppWidgetProvider {
         cntx = context;
         widgetManager = appWidgetManager;
 
-        // Como todavía no tenemos persistencia de los datos, obtenemos de esta forma las excursiones de prueba de la App.
-        createExcursionList();
-
-        String selectedExcursionName = ExcursionWidgetConfigureActivity.loadSelectedExcursionName(cntx, widgetId);
-
-        excursionWidget = getExcursionByName(selectedExcursionName);
-
-        if (excursionWidget != null) {
-            // Se realiza la petición a la API del tiempo.
-            String city = excursionWidget.getLocation();
-            String cityWithoutSpaces = city.replace(" ", "%20");
-            JSONWeatherTask task = new JSONWeatherTask();
-            if (cityWithoutSpaces.contains("%20")) {
-                task.execute(new String[]{cityWithoutSpaces});
-            } else {
-                task.execute(new String[]{city});
-            }
-        }
+        InicializarExcursionesTask task = new InicializarExcursionesTask();
+        task.execute(new String[] {Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)});
     }
 
     @Override
@@ -95,27 +84,6 @@ public class ExcursionWidget extends AppWidgetProvider {
             }
         }
         return null;
-    }
-
-    public static void createExcursionList() {
-
-        // Creamos tres excursiones de prueba y las metemos al array de Excursiones.
-        Excursion exc1 = new Excursion(0, 1,"Ruta del Cares", "Un sitio espectacular con unas vistas impresionantes. Ideal para ir con la familia y para sacar fotos de los acantilados.", "Medio", 12,"Arenas de Cabrales",Float.parseFloat("43.253143"),Float.parseFloat("-4.844181"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_1_1.jpg");
-        Excursion exc2 = new Excursion(0, 2,"Ventana Relux", "Unas vistas impresionantes desde la ventana. Una caída libre espectacular que merece ser fotografiada. Ideal para la familia.", "Facil", 2.7,"Karrantza Harana",Float.parseFloat("43.250062"),Float.parseFloat("-3.411184"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_2_2.jpg");
-        Excursion exc3 = new Excursion(0, 3,"Faro del Caballo", "Excursión muy bonita para ver todos los acantilados del monte Buciero de Santoña. Ideal para ir en pareja y para pasar el día.", "Medio", 12,"Santoña",Float.parseFloat("43.451673"),Float.parseFloat("-3.425712"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_3_3.jpg");
-        Excursion exc4 = new Excursion(0, 4,"Gorbea", "Subida preciosa a uno de los montes más característicos de Bizkaia. Recorrido un poco duro pero el paisaje merece la pena.", "Dificil", 12,"Areatza",Float.parseFloat("43.034984"),Float.parseFloat("-2.779891"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_4_4.jpg");
-        Excursion exc5 = new Excursion(0, 5,"Ruta del Río Borosa", "Espectacular ruta que nos permite apreciar toda la belleza del Rio Borosa y del Parque Nacional de la Sierra de Cazorla.", "Facil", 20,"Jaén",Float.parseFloat("38.009718"),Float.parseFloat("-2.858513"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_5_5.jpg");
-        Excursion exc6 = new Excursion(0, 6,"Chachorros del Río Chiller", "Explorarás un paisaje en el que el agua es tan protagonista que lo mejor que puedes hacer es llevar un calzado que no te importe que se moje.", "Facil", 15,"Nerja",Float.parseFloat("36.831615"),Float.parseFloat("-3.853639"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_6_6.jpg");
-        Excursion exc7 = new Excursion(0, 7,"Ruta de los Pantaneros", "Fabuloso descenso de 80 metros del cañón y cruzar varios puentes colgantes que te llevarán a través de paisajes de Bosque de Ribera y Matorral Mediterráneo.", "Dificil", 5,"Chulilla",Float.parseFloat("39.670969"),Float.parseFloat("-0.888563"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_7_7.jpg");
-
-        arrExcursiones = new ArrayList<Excursion>();
-        arrExcursiones.add(exc1);
-        arrExcursiones.add(exc2);
-        arrExcursiones.add(exc3);
-        arrExcursiones.add(exc4);
-        arrExcursiones.add(exc5);
-        arrExcursiones.add(exc6);
-        arrExcursiones.add(exc7);
     }
 
     private static class JSONWeatherTask extends AsyncTask<String, Void, Weather> {
@@ -240,6 +208,60 @@ public class ExcursionWidget extends AppWidgetProvider {
 
             // Instruct the widget manager to update the widget
             widgetManager.updateAppWidget(widgetId, views);
+        }
+    }
+
+    private static class InicializarExcursionesTask extends AsyncTask<String, Void, ArrayList<OpinionExtendida>> {
+
+        @Override
+        protected ArrayList<OpinionExtendida> doInBackground(String... params) {
+            ArrayList<OpinionExtendida> aloe = null;
+
+            String data = ((new RestClientManager()).obtenerOpinionesUsuario(params[0]));
+            if (data != null) {
+                try {
+                    aloe = RestJSONParserManager.getOpinionesExtendidas(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return aloe;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<OpinionExtendida> aloe) {
+            super.onPostExecute(aloe);
+            if (aloe != null) {
+                // El usuario tiene excursiones
+                arrExcursiones = new ArrayList<Excursion>();
+                for (OpinionExtendida oe : aloe) {
+                    arrExcursiones.add(new Excursion(oe.getIdOpinion(), oe.getExcursion().getIdExcursion(),
+                            oe.getExcursion().getNombre(), oe.getOpinion(), oe.getExcursion().getNivel(),
+                            oe.getExcursion().getDistancia(), oe.getExcursion().getLugar(), oe.getExcursion().getLatitud(),
+                            oe.getExcursion().getLongitud(), oe.getImgPath()));
+                }
+
+                String selectedExcursionName = ExcursionWidgetConfigureActivity.loadSelectedExcursionName(cntx, widgetId);
+
+                excursionWidget = getExcursionByName(selectedExcursionName);
+
+                if (excursionWidget != null) {
+                    // Se realiza la petición a la API del tiempo.
+                    String city = excursionWidget.getLocation();
+                    String cityWithoutSpaces = city.replace(" ", "%20");
+                    JSONWeatherTask task = new JSONWeatherTask();
+                    if (cityWithoutSpaces.contains("%20")) {
+                        task.execute(new String[]{cityWithoutSpaces});
+                    } else {
+                        task.execute(new String[]{city});
+                    }
+                }
+            } else {
+                // El usuario no tiene excursiones
+                arrExcursiones = new ArrayList<Excursion>();
+                Log.i("EXCURSIONES", "El usuario no tiene excursiones");
+            }
         }
     }
 }

@@ -1,20 +1,31 @@
 package es.deusto.trekkingaventura.widget;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
 import es.deusto.trekkingaventura.R;
+import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.entities.OpinionExtendida;
+import es.deusto.trekkingaventura.entitiesDB.UsuarioDB;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
+import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
 
 /**
  * The configuration screen for the {@link ExcursionWidget ExcursionWidget} AppWidget.
@@ -24,7 +35,9 @@ public class ExcursionWidgetConfigureActivity extends Activity {
     private static final String PREFS_NAME = "es.deusto.trekkingaventura.widget.ExcursionWidget";
     private static final String PREF_PREFIX_KEY = "appwidget_";
 
-    private ArrayList<Excursion> arrExcursiones;
+    public static UsuarioDB usuario;
+
+    public static ArrayList<Excursion> arrExcursiones;
 
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     private Spinner spnExcursiones;
@@ -82,24 +95,19 @@ public class ExcursionWidgetConfigureActivity extends Activity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
+        usuario = new UsuarioDB(Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+
+        ObtenerUsuarioTask task = new ObtenerUsuarioTask();
+        task.execute(new String[] {usuario.getIdUsuario()});
+
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if the user presses the back button.
         setResult(RESULT_CANCELED);
 
         setContentView(R.layout.excursion_widget_configure);
 
-        // Como todavía no tenemos persistencia de los datos, obtenemos de esta forma las excursiones de prueba de la App.
-        createExcursionList();
-
         spnExcursiones = (Spinner) findViewById(R.id.excursionesSpiner);
-        String[] items = new String[arrExcursiones.size()];
-        for (int i = 0; i < arrExcursiones.size(); i++) {
-            items[i] = arrExcursiones.get(i).getName();
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(ExcursionWidgetConfigureActivity.this,
-                android.R.layout.simple_spinner_dropdown_item, items);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnExcursiones.setAdapter(adapter);
+
 
         findViewById(R.id.btnAddWidget).setOnClickListener(mOnClickListener);
 
@@ -116,34 +124,165 @@ public class ExcursionWidgetConfigureActivity extends Activity {
             finish();
             return;
         }
+    }
 
-        final String selectedExcursionName = loadSelectedExcursionName(ExcursionWidgetConfigureActivity.this, mAppWidgetId);
-        for (int i = 0; i < arrExcursiones.size(); i++) {
-            if (selectedExcursionName.equals(arrExcursiones.get(i).getName())) {
-                spnExcursiones.setSelection(i);
+    private class ObtenerUsuarioTask extends AsyncTask<String, Void, UsuarioDB> {
+        ProgressDialog progressDialog = new ProgressDialog(ExcursionWidgetConfigureActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Obteniendo datos del usuario...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected UsuarioDB doInBackground(String... params) {
+            UsuarioDB usuario = null;
+
+            String data = ((new RestClientManager()).obtenerUsuarioPorId(params[0]));
+            if (data != null) {
+                try {
+                    usuario = RestJSONParserManager.getUsuarioDB(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
+
+            return usuario;
+        }
+
+        @Override
+        protected void onPostExecute(UsuarioDB usuarioDB) {
+            super.onPostExecute(usuarioDB);
+            if (usuarioDB != null) {
+                usuario = usuarioDB;
+                // Inicializamos la lista de excursiones
+                InicializarExcursionesTask task = new InicializarExcursionesTask();
+                task.execute(new String[]{usuario.getIdUsuario()});
+            } else {
+                // Insertar el usuario.
+                Log.i("USUARIO", "Insertar usuario");
+                InsertarUsuarioTask task = new InsertarUsuarioTask();
+                task.execute(new UsuarioDB[]{new UsuarioDB(usuario.getIdUsuario())});
+            }
+            progressDialog.dismiss();
         }
     }
 
-    private void createExcursionList() {
+    private class InsertarUsuarioTask extends AsyncTask<UsuarioDB, Void, UsuarioDB> {
+        ProgressDialog progressDialog = new ProgressDialog(ExcursionWidgetConfigureActivity.this);
 
-        // Creamos tres excursiones de prueba y las metemos al array de Excursiones.
-        Excursion exc1 = new Excursion(0, 1,"Ruta del Cares", "Un sitio espectacular con unas vistas impresionantes. Ideal para ir con la familia y para sacar fotos de los acantilados.", "Medio", 12,"Arenas de Cabrales",Float.parseFloat("43.253143"),Float.parseFloat("-4.844181"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_1_1.jpg");
-        Excursion exc2 = new Excursion(0, 2,"Ventana Relux", "Unas vistas impresionantes desde la ventana. Una caída libre espectacular que merece ser fotografiada. Ideal para la familia.", "Facil", 2.7,"Karrantza Harana",Float.parseFloat("43.250062"),Float.parseFloat("-3.411184"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_2_2.jpg");
-        Excursion exc3 = new Excursion(0, 3,"Faro del Caballo", "Excursión muy bonita para ver todos los acantilados del monte Buciero de Santoña. Ideal para ir en pareja y para pasar el día.", "Medio", 12,"Santoña",Float.parseFloat("43.451673"),Float.parseFloat("-3.425712"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_3_3.jpg");
-        Excursion exc4 = new Excursion(0, 4,"Gorbea", "Subida preciosa a uno de los montes más característicos de Bizkaia. Recorrido un poco duro pero el paisaje merece la pena.", "Dificil", 12,"Areatza",Float.parseFloat("43.034984"),Float.parseFloat("-2.779891"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_4_4.jpg");
-        Excursion exc5 = new Excursion(0, 5,"Ruta del Río Borosa", "Espectacular ruta que nos permite apreciar toda la belleza del Rio Borosa y del Parque Nacional de la Sierra de Cazorla.", "Facil", 20,"Jaén",Float.parseFloat("38.009718"),Float.parseFloat("-2.858513"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_5_5.jpg");
-        Excursion exc6 = new Excursion(0, 6,"Chachorros del Río Chiller", "Explorarás un paisaje en el que el agua es tan protagonista que lo mejor que puedes hacer es llevar un calzado que no te importe que se moje.", "Facil", 15,"Nerja",Float.parseFloat("36.831615"),Float.parseFloat("-3.853639"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_6_6.jpg");
-        Excursion exc7 = new Excursion(0, 7,"Ruta de los Pantaneros", "Fabuloso descenso de 80 metros del cañón y cruzar varios puentes colgantes que te llevarán a través de paisajes de Bosque de Ribera y Matorral Mediterráneo.", "Dificil", 5,"Chulilla",Float.parseFloat("39.670969"),Float.parseFloat("-0.888563"),"http://res.cloudinary.com/trekkingaventura/image/upload/c2a61b1cd1ac1d22_7_7.jpg");
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
 
-        arrExcursiones = new ArrayList<Excursion>();
-        arrExcursiones.add(exc1);
-        arrExcursiones.add(exc2);
-        arrExcursiones.add(exc3);
-        arrExcursiones.add(exc4);
-        arrExcursiones.add(exc5);
-        arrExcursiones.add(exc6);
-        arrExcursiones.add(exc7);
+            progressDialog.setTitle("Almacenando datos del usuario...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected UsuarioDB doInBackground(UsuarioDB... params) {
+            UsuarioDB usuario = null;
+
+            String data = ((new RestClientManager()).insertarUsuario(params[0]));
+            if (data != null) {
+                try {
+                    usuario = RestJSONParserManager.getUsuarioDB(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return usuario;
+        }
+
+        @Override
+        protected void onPostExecute(UsuarioDB usuarioDB) {
+            super.onPostExecute(usuarioDB);
+            if (usuarioDB != null) {
+                // Se ha insertado correctamente el usuario.
+                Log.i("USUARIO", "El usuario '" + usuarioDB.getIdUsuario() + "' se ha insertado correctamente");
+
+                // Inicializamos la lista de excursiones
+                InicializarExcursionesTask taskExcursiones = new InicializarExcursionesTask();
+                taskExcursiones.execute(new String[]{usuarioDB.getIdUsuario()});
+            } else {
+                // Insertar el usuario.
+                Log.i("USUARIO", "No se ha podido insertar el usuario");
+            }
+            progressDialog.dismiss();
+        }
+    }
+
+    private class InicializarExcursionesTask extends AsyncTask<String, Void, ArrayList<OpinionExtendida>> {
+        ProgressDialog progressDialog = new ProgressDialog(ExcursionWidgetConfigureActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Cargando excursiones del usuario...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<OpinionExtendida> doInBackground(String... params) {
+            ArrayList<OpinionExtendida> aloe = null;
+
+            String data = ((new RestClientManager()).obtenerOpinionesUsuario(params[0]));
+            if (data != null) {
+                try {
+                    aloe = RestJSONParserManager.getOpinionesExtendidas(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return aloe;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<OpinionExtendida> aloe) {
+            super.onPostExecute(aloe);
+            if (aloe != null) {
+                // El usuario tiene excursiones
+                Log.i("EXCURSIONES", "El usuario '" + usuario.getIdUsuario() + "' tiene excursiones");
+                arrExcursiones = new ArrayList<Excursion>();
+                for (OpinionExtendida oe : aloe) {
+                    arrExcursiones.add(new Excursion(oe.getIdOpinion(), oe.getExcursion().getIdExcursion(),
+                            oe.getExcursion().getNombre(), oe.getOpinion(), oe.getExcursion().getNivel(),
+                            oe.getExcursion().getDistancia(), oe.getExcursion().getLugar(), oe.getExcursion().getLatitud(),
+                            oe.getExcursion().getLongitud(), oe.getImgPath()));
+                }
+
+                String[] items = new String[arrExcursiones.size()];
+                for (int i = 0; i < arrExcursiones.size(); i++) {
+                    items[i] = arrExcursiones.get(i).getName();
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(ExcursionWidgetConfigureActivity.this,
+                        android.R.layout.simple_spinner_dropdown_item, items);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spnExcursiones.setAdapter(adapter);
+
+                final String selectedExcursionName = loadSelectedExcursionName(ExcursionWidgetConfigureActivity.this, mAppWidgetId);
+                for (int i = 0; i < arrExcursiones.size(); i++) {
+                    if (selectedExcursionName.equals(arrExcursiones.get(i).getName())) {
+                        spnExcursiones.setSelection(i);
+                    }
+                }
+            } else {
+                // El usuario no tiene excursiones
+                arrExcursiones = new ArrayList<Excursion>();
+                Log.i("EXCURSIONES", "El usuario no tiene excursiones");
+            }
+
+            progressDialog.dismiss();
+        }
     }
 }
 
