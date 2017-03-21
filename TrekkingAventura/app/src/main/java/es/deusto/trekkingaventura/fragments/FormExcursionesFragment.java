@@ -285,20 +285,6 @@ public class FormExcursionesFragment extends Fragment implements
                 }
 
                 if (editar) {
-                    for (Excursion e : arrExcursiones) {
-                        if (e.getIdOpinion() == excursion.getIdOpinion()) {
-                            e.setName(excursion.getName());
-                            e.setOpinion(excursion.getOpinion());
-                            e.setLocation(excursion.getLocation());
-                            e.setTravelDistance(excursion.getTravelDistance());
-                            e.setLevel(excursion.getLevel());
-                            e.setLatitude(excursion.getLatitude());
-                            e.setLongitude(excursion.getLongitude());
-                            e.setImgPath(excursion.getImgPath());
-                            break;
-                        }
-                    }
-
                     OpinionDB opinion = new OpinionDB(excursion.getIdOpinion(), MainActivity.usuario.getIdUsuario(),
                             excursion.getIdExcursion(), excursion.getOpinion(), excursion.getImgPath());
 
@@ -308,13 +294,6 @@ public class FormExcursionesFragment extends Fragment implements
                     // Estamos creando una nueva excursión
                     arrExcursiones.add(excursion);
                 }
-
-                Fragment fragment = new MisExcursionesFragment();
-                Bundle args = new Bundle();
-                args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
-                args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
-                fragment.setArguments(args);
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
 
                 return true;
             }
@@ -746,6 +725,68 @@ public class FormExcursionesFragment extends Fragment implements
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            InicializarExcursionesTask task = new InicializarExcursionesTask();
+            task.execute(new String[] {MainActivity.usuario.getIdUsuario()});
+
+            progressDialog.dismiss();
+        }
+    }
+
+    private class InicializarExcursionesTask extends AsyncTask<String, Void, ArrayList<OpinionExtendida>> {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Cargando excursiones del usuario...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ArrayList<OpinionExtendida> doInBackground(String... params) {
+            ArrayList<OpinionExtendida> aloe = null;
+
+            String data = ((new RestClientManager()).obtenerOpinionesUsuario(params[0]));
+            if (data != null) {
+                try {
+                    aloe = RestJSONParserManager.getOpinionesExtendidas(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return aloe;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<OpinionExtendida> aloe) {
+            super.onPostExecute(aloe);
+            if (aloe != null) {
+                // El usuario tiene excursiones
+                arrExcursiones = new ArrayList<Excursion>();
+                for (OpinionExtendida oe : aloe) {
+                    arrExcursiones.add(new Excursion(oe.getIdOpinion(), oe.getExcursion().getIdExcursion(),
+                            oe.getExcursion().getNombre(), oe.getOpinion(), oe.getExcursion().getNivel(),
+                            oe.getExcursion().getDistancia(), oe.getExcursion().getLugar(), oe.getExcursion().getLatitud(),
+                            oe.getExcursion().getLongitud(), oe.getImgPath()));
+                }
+                arrOpinionesExtendidas = aloe;
+            } else {
+                // El usuario no tiene excursiones
+                arrExcursiones = new ArrayList<Excursion>();
+                arrOpinionesExtendidas = new ArrayList<OpinionExtendida>();
+            }
+
+            Fragment fragment = new MisExcursionesFragment();
+            Bundle args = new Bundle();
+            args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);
+            args.putSerializable(MisExcursionesFragment.ARG_MIS_OPINIONES_EXTENDIDAS, arrOpinionesExtendidas);
+            args.putSerializable(MisExcursionesFragment.ARG_MIS_EXCURSIONES, arrExcursiones);
+            fragment.setArguments(args);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
 
             progressDialog.dismiss();
         }
