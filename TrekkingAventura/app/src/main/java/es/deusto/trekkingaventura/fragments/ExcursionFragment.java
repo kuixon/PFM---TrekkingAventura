@@ -389,6 +389,9 @@ public class ExcursionFragment extends Fragment {
                 arrOpinionesExtendidas = new ArrayList<OpinionExtendida>();
             }
 
+            MainActivity.arrExcursiones = arrExcursiones;
+            MainActivity.arrOpinionesExtendidas = arrOpinionesExtendidas;
+
             Fragment fragment = new MisExcursionesFragment();
             Bundle args = new Bundle();
             args.putInt(MisExcursionesFragment.ARG_MIS_EXCURSIONES_NUMBER, 0);

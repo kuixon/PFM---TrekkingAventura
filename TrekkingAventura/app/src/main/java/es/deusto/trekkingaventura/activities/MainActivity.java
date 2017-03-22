@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
     private CharSequence itemTitle;
     private String[] tagTitles;
 
-    private ArrayList<Excursion> arrExcursiones;
-    private ArrayList<OpinionExtendida> arrOpinionesExtendidas;
+    public static ArrayList<Excursion> arrExcursiones;
+    public static ArrayList<OpinionExtendida> arrOpinionesExtendidas;
 
     // Para cuando se accede desde una notificación
     public static final String ARG_NOTIFICATION_EXC = "arg_notification_exc";

@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.ExcursionDestacada;
 import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entitiesDB.ExcursionDB;
@@ -29,18 +28,21 @@ public class RestJSONParserManager {
         return usuario;
     }
 
-    public static OpinionDB getOpinionDB(String data) throws JSONException {
-        OpinionDB opinion = new OpinionDB();
+    public static ExcursionDB getExcursionDB(String data) throws JSONException {
+        ExcursionDB excursion = new ExcursionDB();
 
-        JSONObject jObj = new JSONObject(data);
+        JSONObject root = new JSONObject(data);
 
-        opinion.setIdOpinion(jObj.getInt("idOpinion"));
-        opinion.setIdUsuario(jObj.getString("idUsuario"));
-        opinion.setIdExcursion(jObj.getInt("idExcursion"));
-        opinion.setOpinion(jObj.getString("opinion"));
-        opinion.setFoto(jObj.getString("foto"));
+        excursion.setIdExcursion(root.getInt("idExcursion"));
+        excursion.setNombre(root.getString("nombre"));
+        excursion.setNivel(root.getString("nivel"));
+        excursion.setLugar(root.getString("lugar"));
+        excursion.setDistancia(root.getDouble("distancia"));
+        excursion.setFoto(root.getString("foto"));
+        excursion.setLatitud(Float.parseFloat(root.getString("latitud")));
+        excursion.setLongitud(Float.parseFloat(root.getString("longitud")));
 
-        return opinion;
+        return excursion;
     }
 
     public static ArrayList<OpinionExtendida> getOpinionesExtendidas(String data) throws JSONException {

@@ -51,7 +51,9 @@ import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.OpinionExtendida;
+import es.deusto.trekkingaventura.entitiesDB.ExcursionDB;
 import es.deusto.trekkingaventura.entitiesDB.OpinionDB;
+import es.deusto.trekkingaventura.entitiesDB.UsuarioDB;
 import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
 import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
 import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
@@ -291,8 +293,8 @@ public class FormExcursionesFragment extends Fragment implements
                     EditarOpinionTask task = new EditarOpinionTask();
                     task.execute(new OpinionDB[] {opinion});
                 } else {
-                    // Estamos creando una nueva excursión
-                    arrExcursiones.add(excursion);
+                    ObtenerExcursionTask task = new ObtenerExcursionTask();
+                    task.execute(new String[] {excursion.getName()});
                 }
 
                 return true;
@@ -733,6 +735,137 @@ public class FormExcursionesFragment extends Fragment implements
         }
     }
 
+    private class ObtenerExcursionTask extends AsyncTask<String, Void, ExcursionDB> {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Cargando datos de la excursión...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ExcursionDB doInBackground(String... params) {
+            ExcursionDB excursion = null;
+
+            String data = ((new RestClientManager()).obtenerExcursionPorNombre(params[0]));
+            if (data != null) {
+                try {
+                    excursion = RestJSONParserManager.getExcursionDB(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return excursion;
+        }
+
+        @Override
+        protected void onPostExecute(ExcursionDB e) {
+            super.onPostExecute(e);
+            if (e != null) {
+                // Insertamos la opinión en la BD
+                InsertarOpinionTask task = new InsertarOpinionTask();
+                task.execute(new OpinionDB[] {new OpinionDB(MainActivity.usuario.getIdUsuario(), e.getIdExcursion(),
+                        excursion.getOpinion(), excursion.getImgPath())});
+            } else {
+                // Si la excursión no existe, la insertamos en la BD
+                InsertarExcursionTask task = new InsertarExcursionTask();
+                task.execute(new ExcursionDB[] {new ExcursionDB(excursion.getName(), excursion.getLevel(),
+                        excursion.getLocation(), excursion.getTravelDistance(), excursion.getImgPath(),
+                        excursion.getLatitude(), excursion.getLongitude())});
+            }
+            progressDialog.dismiss();
+        }
+    }
+
+    private class InsertarExcursionTask extends AsyncTask<ExcursionDB, Void, ExcursionDB> {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Guardando excursión...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ExcursionDB doInBackground(ExcursionDB... params) {
+            ExcursionDB excursion = null;
+
+            String data = ((new RestClientManager()).insertarExcursion(params[0]));
+            if (data != null) {
+                try {
+                    excursion = RestJSONParserManager.getExcursionDB(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return excursion;
+        }
+
+        @Override
+        protected void onPostExecute(ExcursionDB e) {
+            super.onPostExecute(e);
+            if (e != null) {
+                // Se ha insertado correctamente la excursión.
+                Log.i("INSERTAR_EXCURSIÓN", "La excursión '" + e.getIdExcursion() + "' se ha insertado correctamente");
+
+                // Llamamos a insertar opinion.
+                InsertarOpinionTask task = new InsertarOpinionTask();
+                task.execute(new OpinionDB[] {new OpinionDB(MainActivity.usuario.getIdUsuario(), e.getIdExcursion(),
+                        excursion.getOpinion(), excursion.getImgPath())});
+            } else {
+                // No se ha podido insertar la excursión.
+                Log.i("INSERTAR_EXCURSIÓN", "No se ha podido insertar la excursión");
+            }
+            progressDialog.dismiss();
+        }
+    }
+
+    private class InsertarOpinionTask extends AsyncTask<OpinionDB, Void, Void> {
+        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog.setTitle("Guardando excursión...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(OpinionDB... params) {
+            String data = (new RestClientManager()).insertarOpinion(params[0]);
+            if (data != null) {
+                // Se ha insertado correctamente
+                Log.i("INSERTAR_OPINIÓN", "Se ha insertado la opinión correctamente");
+            } else {
+                // No se ha editado la opinión
+                Log.i("INSERTAR_OPINIÓN", "NO se ha podido insertar la opinión");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            InicializarExcursionesTask task = new InicializarExcursionesTask();
+            task.execute(new String[] {MainActivity.usuario.getIdUsuario()});
+
+            progressDialog.dismiss();
+        }
+    }
+
     private class InicializarExcursionesTask extends AsyncTask<String, Void, ArrayList<OpinionExtendida>> {
         ProgressDialog progressDialog = new ProgressDialog(getActivity());
 
@@ -779,6 +912,9 @@ public class FormExcursionesFragment extends Fragment implements
                 arrExcursiones = new ArrayList<Excursion>();
                 arrOpinionesExtendidas = new ArrayList<OpinionExtendida>();
             }
+
+            MainActivity.arrExcursiones = arrExcursiones;
+            MainActivity.arrOpinionesExtendidas = arrOpinionesExtendidas;
 
             Fragment fragment = new MisExcursionesFragment();
             Bundle args = new Bundle();
