@@ -110,6 +110,7 @@ public class FormExcursionesFragment extends Fragment implements
 
     private Uri imageUri;
 
+    private String initialImgPath = null;
     private boolean editar;
     private boolean localImagePath = false;
 
@@ -242,6 +243,7 @@ public class FormExcursionesFragment extends Fragment implements
             } else {
                 Fragment fragment = new ExcursionFragment();
                 Bundle args = new Bundle();
+                excursion.setImgPath(initialImgPath);
                 args.putSerializable(ExcursionFragment.EXCURSION_KEY, excursion);
                 args.putSerializable(ExcursionFragment.ARG_EXCURSIONES, arrExcursiones);
                 fragment.setArguments(args);
@@ -456,6 +458,8 @@ public class FormExcursionesFragment extends Fragment implements
         edtLatitude.setText(Float.toString(excursion.getLatitude()));
         edtLongitude.setText(Float.toString(excursion.getLongitude()));
 
+        initialImgPath = excursion.getImgPath();
+
         if(excursion.getImgPath() != null && !excursion.getImgPath().isEmpty()) {
             txtImage.setText(excursion.getImgPath());
             txtImage.setVisibility(View.VISIBLE);
@@ -471,6 +475,7 @@ public class FormExcursionesFragment extends Fragment implements
         rbtnHigh.setEnabled(false);
         edtLatitude.setEnabled(false);
         edtLongitude.setEnabled(false);
+        btnGeolocate.setEnabled(false);
     }
 
     private boolean validateFields() {
