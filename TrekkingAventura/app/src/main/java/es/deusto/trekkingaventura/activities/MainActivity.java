@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             if (getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC) != null) {
+                appFirstTimeOpened = false;
                 InicializarExcursionesTask task = new InicializarExcursionesTask();
                 task.execute(new String[] {usuario.getIdUsuario(), "notification"});
             } else {
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Cuando llegamos a esta actividad desde una notificación
         if(getIntent().getAction().equals("OPEN_EXC_FRAGMENT")) {
+            appFirstTimeOpened = false;
             InicializarExcursionesTask task = new InicializarExcursionesTask();
             task.execute(new String[] {usuario.getIdUsuario(), "notification"});
         }
