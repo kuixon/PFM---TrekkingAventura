@@ -1,16 +1,18 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,16 +30,16 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import es.deusto.trekkingaventura.R;
-import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.adapters.ExcursionListAdapter;
 import es.deusto.trekkingaventura.entities.Excursion;
 import es.deusto.trekkingaventura.entities.OpinionExtendida;
 
 public class MisExcursionesFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
+
+    public static final int REQUEST_LOCATION_ENABLE = 1;
 
     public static final String ARG_MIS_EXCURSIONES_NUMBER = "mis_excursiones_number";
     public static final String ARG_MIS_EXCURSIONES = "mis_excursiones";
@@ -263,8 +265,38 @@ public class MisExcursionesFragment extends Fragment implements GoogleApiClient.
         Log.i("Location client", "Connected");
 
         if (filter && distance > 0) {
-            Location userLocation = getUserLocation();
-            applyFilter(userLocation);
+            // Comprobamos los permisos de Geolocalización
+            if (ContextCompat.checkSelfPermission(getContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                Log.i("INFO_GEOLOC", "Se solicitan los permisos");
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_ENABLE);
+            } else {
+                Location userLocation = getUserLocation();
+                applyFilter(userLocation);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.i("INFO_GEOLOC", "Se reciben las solicitudes de permisos.");
+        switch (requestCode) {
+            case REQUEST_LOCATION_ENABLE: {
+                Log.i("INFO_GEOLOC", "Se entra al case de REQUEST_LOCATION_ENABLE");
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Location userLocation = getUserLocation();
+                    applyFilter(userLocation);
+                } else {
+                    Log.i("INFO_GEOLOC", "Se deniegan los permisos");
+                    showMessageDialog("ERROR: La app no puede utilizar esta funcionalidad porque no se han concedido" +
+                            " permisos de localización.\n\nINFO: La aplicación utiliza tu localización para ayudarte a" +
+                            " realizar el filtrado por distancia de tus excursiones (Ajustes).");
+                }
+                return;
+            }
         }
     }
 
