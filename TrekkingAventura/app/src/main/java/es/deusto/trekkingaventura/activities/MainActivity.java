@@ -138,14 +138,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             if (getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC) != null) {
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyAppFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyFragment()).commit();
-
-                Fragment fragment = new ExcursionFragment();
-                Bundle args = new Bundle();
-                args.putSerializable(ExcursionFragment.EXCURSION_KEY, getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC));
-                fragment.setArguments(args);
-                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+                InicializarExcursionesTask task = new InicializarExcursionesTask();
+                task.execute(new String[] {usuario.getIdUsuario(), "notification"});
             } else {
                 // Comprobamos si el usuario existe en la BD y si no existe lo insertamos.
                 ObtenerUsuarioTask task = new ObtenerUsuarioTask();
@@ -155,14 +149,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Cuando llegamos a esta actividad desde una notificación
         if(getIntent().getAction().equals("OPEN_EXC_FRAGMENT")) {
-            getFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyAppFragment()).commit();
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyFragment()).commit();
-
-            Fragment fragment = new ExcursionFragment();
-            Bundle args = new Bundle();
-            args.putSerializable(ExcursionFragment.EXCURSION_KEY, getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC));
-            fragment.setArguments(args);
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            InicializarExcursionesTask task = new InicializarExcursionesTask();
+            task.execute(new String[] {usuario.getIdUsuario(), "notification"});
         }
 
         // Se comprueba la alarma para saber si hay que lanzarla o no.
@@ -343,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Inicializamos la lista de excursiones
                 InicializarExcursionesTask task = new InicializarExcursionesTask();
-                task.execute(new String[]{usuario.getIdUsuario()});
+                task.execute(new String[]{usuario.getIdUsuario(), null});
             } else {
                 // Insertar el usuario.
                 Log.i("USUARIO", "Insertar usuario");
@@ -391,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Inicializamos la lista de excursiones
                 InicializarExcursionesTask taskExcursiones = new InicializarExcursionesTask();
-                taskExcursiones.execute(new String[]{usuarioDB.getIdUsuario()});
+                taskExcursiones.execute(new String[]{usuarioDB.getIdUsuario(), null});
             } else {
                 // Insertar el usuario.
                 Log.i("USUARIO", "No se ha podido insertar el usuario");
@@ -402,6 +390,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class InicializarExcursionesTask extends AsyncTask<String, Void, ArrayList<OpinionExtendida>> {
         ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+        private boolean notification = false;
 
         @Override
         protected void onPreExecute() {
@@ -414,6 +403,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected ArrayList<OpinionExtendida> doInBackground(String... params) {
+            if (params[1] != null && params[1].equals("notification")) {
+                notification = true;
+            }
+
             ArrayList<OpinionExtendida> aloe = null;
 
             String data = ((new RestClientManager()).obtenerOpinionesUsuario(params[0]));
@@ -449,7 +442,20 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("EXCURSIONES", "El usuario no tiene excursiones");
             }
 
-            selectItem(1);
+            if (notification) {
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyAppFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new EmptyFragment()).commit();
+
+                Fragment fragment = new ExcursionFragment();
+                Bundle args = new Bundle();
+                args.putSerializable(ExcursionFragment.ARG_OPINIONES_EXTENDIDAS, arrOpinionesExtendidas);
+                args.putSerializable(ExcursionFragment.ARG_EXCURSIONES, arrExcursiones);
+                args.putSerializable(ExcursionFragment.EXCURSION_KEY, getIntent().getSerializableExtra(ARG_NOTIFICATION_EXC));
+                fragment.setArguments(args);
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+            } else {
+                selectItem(1);
+            }
 
             progressDialog.dismiss();
         }

@@ -1,11 +1,15 @@
 package es.deusto.trekkingaventura.fragments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
@@ -33,12 +37,14 @@ import java.util.ArrayList;
 import es.deusto.trekkingaventura.R;
 import es.deusto.trekkingaventura.activities.MainActivity;
 import es.deusto.trekkingaventura.entities.Excursion;
+import es.deusto.trekkingaventura.entities.InternetAlarm;
 import es.deusto.trekkingaventura.entities.OpinionExtendida;
 import es.deusto.trekkingaventura.entities.Weather;
 import es.deusto.trekkingaventura.imagesAPI.CloudinaryClient;
 import es.deusto.trekkingaventura.imagesAPI.PicassoClient;
 import es.deusto.trekkingaventura.restDatabaseAPI.RestClientManager;
 import es.deusto.trekkingaventura.restDatabaseAPI.RestJSONParserManager;
+import es.deusto.trekkingaventura.utilities.InternetAlarmManager;
 import es.deusto.trekkingaventura.weatherAPI.JSONWeatherParser;
 import es.deusto.trekkingaventura.weatherAPI.WeatherHttpClient;
 
@@ -76,6 +82,8 @@ public class ExcursionFragment extends Fragment {
     private ImageView imgWeather;
     private LinearLayout panelTiempo;
     private LinearLayout panelTiempoNoDisponible;
+
+    private SharedPreferences sharedPref;
 
     public ExcursionFragment() {
 
@@ -118,6 +126,8 @@ public class ExcursionFragment extends Fragment {
         imgWeather = (ImageView) rootView.findViewById(R.id.condIcon);
         panelTiempo = (LinearLayout) rootView.findViewById(R.id.panelTiempo);
         panelTiempoNoDisponible = (LinearLayout) rootView.findViewById(R.id.panelTiempoNoDisponible);
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         if(excursion.getImgPath() == null || excursion.getImgPath().isEmpty()) {
             imgExc.setImageResource(R.drawable.imgnotavailable);
@@ -189,12 +199,31 @@ public class ExcursionFragment extends Fragment {
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
             return true;
         } else if (id == R.id.mnu_delete_exc) {
-            EliminarOpinionTask task = new EliminarOpinionTask();
-            task.execute(new String[] {Integer.toString(excursion.getIdOpinion())});
+            String idExcursionNotification = sharedPref.getString("excursiones", "");
+            if (Integer.parseInt(idExcursionNotification) == excursion.getIdExcursion()) {
+                showMessageDialog("No puedes eliminar esta excursión porque la tienes seleccionada en el panel de ajustes (Notificaciones)");
+            } else {
+                EliminarOpinionTask task = new EliminarOpinionTask();
+                task.execute(new String[] {Integer.toString(excursion.getIdOpinion())});
+            }
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void showMessageDialog(String str) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(str);
+        builder.setCancelable(false);
+        builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private class JSONWeatherTask extends AsyncTask<String, Void, Weather> {
